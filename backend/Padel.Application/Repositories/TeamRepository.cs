@@ -1,9 +1,4 @@
 ﻿using Padel.Application.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Padel.Application.Repositories
 {
@@ -14,8 +9,15 @@ namespace Padel.Application.Repositories
 
         public Task<bool> CreateAsync(Team team)
         {
-           _teams.Add(team);
+            // Check if a team with the same Id already exists
+            if (_teams.Any(t => t.Id == team.Id))
+            {
+                // Return false if a team with the same Id already exists
+                return Task.FromResult(false);
+            }
 
+            // Add the team if it doesn't already exist
+            _teams.Add(team);
             return Task.FromResult(true);
         }
 
@@ -26,9 +28,16 @@ namespace Padel.Application.Repositories
             return Task.FromResult(movieRemoved);
         }
 
+        public Task<bool> ExistsByIdAsync(Guid id)
+        {
+            var teamExists = _teams.Any(t => t.Id == id);
+
+            return Task.FromResult(teamExists);
+        }
+
         public Task<IEnumerable<Team>> GetAllAsync()
         {
-           return Task.FromResult(_teams.AsEnumerable());
+            return Task.FromResult(_teams.AsEnumerable());
         }
 
         public Task<Team?> GetByIdAsync(Guid id)
@@ -43,7 +52,7 @@ namespace Padel.Application.Repositories
         {
             var teamIndex = _teams.FindIndex(t => t.Id == team.Id);
             if (teamIndex == -1)
-            { 
+            {
                 return Task.FromResult(false);
             }
             _teams[teamIndex] = team;

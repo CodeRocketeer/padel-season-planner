@@ -1,3 +1,4 @@
+using Padel.Api.Mapping;
 using Padel.Application;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapControllers();
 
 app.Run();

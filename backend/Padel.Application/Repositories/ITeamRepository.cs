@@ -1,9 +1,5 @@
-﻿using Padel.Application.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Padel.Application.Models;
 
 namespace Padel.Application.Repositories
 {
@@ -19,6 +15,8 @@ namespace Padel.Application.Repositories
         Task<bool> UpdateAsync(Team team);
 
         Task<bool> DeleteByIdAsync(Guid id);
+
+        Task<bool> ExistsByIdAsync(Guid id);
 
     }
 }

@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace Padel.Contracts.Requests.Player
 {
-    public class CreatePlayerRequest
+    public class PlayerUpdateRequest
     {
 
-        public required Guid UserId { get; set; }
-
-        
-
+        public string Name { get; set; }
+        public string Sex { get; set; }
     }
 }
