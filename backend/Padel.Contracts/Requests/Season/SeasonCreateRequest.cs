@@ -9,7 +9,7 @@ namespace Padel.Contracts.Requests.Season
     public class SeasonCreateRequest
     {
 
-        public required DayOfWeek DayOfWeek { get; init; }
+        public required int DayOfWeek { get; init; }
 
         public required int AmountOfMatches { get; init; }
 

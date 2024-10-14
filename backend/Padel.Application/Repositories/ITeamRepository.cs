@@ -1,22 +1,23 @@
 ﻿
-using Padel.Application.Models;
+
+using Padel.Domain.Models;
 
 namespace Padel.Application.Repositories
 {
     public interface ITeamRepository
     {
 
-        Task<bool> CreateAsync(Team team);
+        Task<bool> CreateAsync(Team team, CancellationToken token = default);
 
-        Task<Team?> GetByIdAsync(Guid id);
+        Task<Team?> GetByIdAsync(Guid id, CancellationToken token = default);
 
-        Task<IEnumerable<Team>> GetAllAsync();
+        Task<IEnumerable<Team>> GetAllAsync(CancellationToken token = default);
 
-        Task<bool> UpdateAsync(Team team);
+        Task<bool> UpdateAsync(Team team, CancellationToken token = default);
 
-        Task<bool> DeleteByIdAsync(Guid id);
+        Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default);
 
-        Task<bool> ExistsByIdAsync(Guid id);
+        Task<bool> ExistsByIdAsync(Guid id, CancellationToken token = default);
 
     }
 }

@@ -1,5 +1,5 @@
 
-using Padel.Application.Models;
+
 using Padel.Application.Repositories;
 using Padel.Domain.Models;
 

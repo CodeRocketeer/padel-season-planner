@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Padel.Application.Database;
 using Padel.Application.Repositories;
 using Padel.Application.Services;
 using System;
@@ -16,9 +17,21 @@ namespace Padel.Application
         {
             services.AddSingleton<ITeamRepository , TeamRepository>();
             services.AddSingleton<IPlayerRepository , PlayerRepository>();
+            services.AddSingleton<IMatchRepository , MatchRepository>();
+            services.AddSingleton<ISeasonRepository , SeasonRepository>();
             services.AddSingleton<ITeamService, TeamService>();
+            services.AddSingleton<IPlayerService, PlayerService>();
+            services.AddSingleton<IMatchService, MatchService>();
+            services.AddSingleton<ISeasonService, SeasonService>();
             services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
 
+            return services;
+        }
+
+        public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
+        {
+            services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlConnectionFactory(connectionString));
+            services.AddSingleton<DbInitializer>();
             return services;
         }
     }

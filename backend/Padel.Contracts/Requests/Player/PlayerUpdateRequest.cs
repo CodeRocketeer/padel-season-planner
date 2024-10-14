@@ -9,7 +9,8 @@ namespace Padel.Contracts.Requests.Player
     public class PlayerUpdateRequest
     {
 
-        public string Name { get; set; }
-        public string Sex { get; set; }
+        public string Name { get; init; }
+        public Guid UserId { get; init; }
+        public string Sex { get; init; }
     }
 }

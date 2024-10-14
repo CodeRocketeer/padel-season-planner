@@ -1,6 +1,6 @@
 
-using Padel.Application.Models;
 using Padel.Application.Repositories;
+using Padel.Domain.Models;
 
 namespace Padel.Application.Tests.Repositories
 {
@@ -20,16 +20,11 @@ namespace Padel.Application.Tests.Repositories
         public async Task CreateAsync_ShouldAddTeamSuccessfully()
         {
             // Arrange
-            var team = new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
+            var team = CreateValidTeam();
 
             // Act
             var result = await _teamRepository.CreateAsync(team);
+
 
             // Assert
             Assert.True(result);
@@ -40,22 +35,9 @@ namespace Padel.Application.Tests.Repositories
         [Fact]
         public async Task CreateAsync_ShouldAddMultipleTeamsSuccessfully()
         {
-            // Arrange
-            var team1 = new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
+            var team1 = CreateValidTeam();
 
-            var team2 = new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
+            var team2 = CreateValidTeam();
 
             // Act
             var result1 = await _teamRepository.CreateAsync(team1);
@@ -73,22 +55,10 @@ namespace Padel.Application.Tests.Repositories
         public async Task CreateAsync_ShouldNotAllowDuplicateIds()
         {
             // Arrange
-            var teamId = Guid.NewGuid();
-            var team1 = new Team
-            {
-                Id = teamId,
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
 
-            var team2 = new Team
-            {
-                Id = teamId, // Same Id as team1
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
+            var team1 = CreateValidTeam();
+
+            var team2 = new Team(team1.Id, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
 
             // Act
             await _teamRepository.CreateAsync(team1);
@@ -106,13 +76,8 @@ namespace Padel.Application.Tests.Repositories
         public async Task GetByIdAsync_ShouldReturnCorrectTeam()
         {
             // Arrange
-            var team = new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
+            var team = CreateValidTeam();
+
             await _teamRepository.CreateAsync(team);
 
             // Act
@@ -143,21 +108,12 @@ namespace Padel.Application.Tests.Repositories
         [Fact]
         public async Task GetAllAsync_ShouldReturnAllTeams()
         {
+
             // Arrange
-            var team1 = new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
-            var team2 = new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
+            var team1 = CreateValidTeam();
+
+            var team2 = CreateValidTeam();
+
             await _teamRepository.CreateAsync(team1);
             await _teamRepository.CreateAsync(team2);
 
@@ -184,23 +140,13 @@ namespace Padel.Application.Tests.Repositories
         [Fact]
         public async Task UpdateAsync_ShouldUpdateTeamSuccessfully()
         {
+
             // Arrange
-            var team = new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
+            var team = CreateValidTeam();
+
             await _teamRepository.CreateAsync(team);
 
-            var updatedTeam = new Team
-            {
-                Id = team.Id, // Keep the same Id
-                MatchId = Guid.NewGuid(), // Change MatchId
-                Player1Id = team.Player1Id,
-                Player2Id = team.Player2Id
-            };
+            var updatedTeam = new Team(team.Id, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
 
             // Act
             var result = await _teamRepository.UpdateAsync(updatedTeam);
@@ -216,13 +162,7 @@ namespace Padel.Application.Tests.Repositories
         public async Task UpdateAsync_ShouldReturnFalseWhenTeamDoesNotExist()
         {
             // Arrange
-            var nonExistentTeam = new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
+            var nonExistentTeam = CreateValidTeam();
 
             // Act
             var result = await _teamRepository.UpdateAsync(nonExistentTeam);
@@ -236,13 +176,7 @@ namespace Padel.Application.Tests.Repositories
         public async Task DeleteByIdAsync_ShouldRemoveTeamSuccessfully()
         {
             // Arrange
-            var team = new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = Guid.NewGuid(),
-                Player1Id = Guid.NewGuid(),
-                Player2Id = Guid.NewGuid()
-            };
+            var team = CreateValidTeam();
             await _teamRepository.CreateAsync(team);
 
             // Act
@@ -265,6 +199,11 @@ namespace Padel.Application.Tests.Repositories
 
             // Assert
             Assert.False(result);
+        }
+
+        private Team CreateValidTeam()
+        {
+            return new Team(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         }
     }
 }

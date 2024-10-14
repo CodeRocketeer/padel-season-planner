@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Padel.Api.Mapping;
 using Padel.Application.Repositories;
+using Padel.Application.Services;
 using Padel.Contracts.Requests.Player;
 
 namespace Padel.Api.Controllers
@@ -9,28 +10,28 @@ namespace Padel.Api.Controllers
     [ApiController]
     public class PlayersController : ControllerBase
     {
-        private readonly IPlayerRepository _playerRepository;
+        private readonly IPlayerService _playerService;
 
-        public PlayersController(IPlayerRepository playerRepository)
+        public PlayersController(IPlayerService playerService)
         {
-            _playerRepository = playerRepository;
+            _playerService = playerService;
         }
 
 
         [HttpPost(ApiEndpoints.Players.Create)]
-        public async Task<IActionResult> Create([FromBody] PlayerCreateRequest request)
+        public async Task<IActionResult> Create([FromBody] PlayerCreateRequest request, CancellationToken token)
         {
             var player = request.MapToPlayer();
-            var result = await _playerRepository.CreateAsync(player);
+            var result = await _playerService.CreateAsync(player, token);
             return CreatedAtAction(nameof(Get), new { id = player.Id }, player.MapToResponse());
 
 
         }
 
         [HttpGet(ApiEndpoints.Players.Get)]
-        public async Task<IActionResult> Get([FromRoute] Guid id)
+        public async Task<IActionResult> Get([FromRoute] Guid id, CancellationToken token)
         {
-            var player = await _playerRepository.GetByIdAsync(id);
+            var player = await _playerService.GetByIdAsync(id, token);
 
             if (player is null) return NotFound();
             var response = player.MapToResponse();
@@ -38,30 +39,28 @@ namespace Padel.Api.Controllers
         }
 
         [HttpGet(ApiEndpoints.Players.GetAll)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken token)
         {
-            var players = await _playerRepository.GetAllAsync();
+            var players = await _playerService.GetAllAsync(token);
             var moviesResponse = players.MapToResponse();
             return Ok(moviesResponse);
         }
 
         [HttpPut(ApiEndpoints.Players.Update)]
-        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] PlayerUpdateRequest request)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] PlayerUpdateRequest request, CancellationToken token)
         {
             var player = request.MapToPlayer(id);
-            var updated = await _playerRepository.UpdateAsync(player);
+            var updatedPlayer = await _playerService.UpdateAsync(player, token);
 
-            if (!updated) return NotFound();
-
-            var response = player.MapToResponse();
-            return Ok(response);
+            if (updatedPlayer is null) return NotFound();
+            return Ok(player.MapToResponse());
 
         }
 
         [HttpDelete(ApiEndpoints.Players.Delete)]
-        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken token)
         {
-            var deleted = await _playerRepository.DeleteByIdAsync(id);
+            var deleted = await _playerService.DeleteByIdAsync(id, token);
 
             if (!deleted) return NotFound();
 

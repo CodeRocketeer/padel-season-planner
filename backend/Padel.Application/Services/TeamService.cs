@@ -1,55 +1,48 @@
-﻿using FluentValidation;
-using Padel.Application.Models;
-using Padel.Application.Repositories;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Padel.Domain.Models;
+using Padel.Application.Repositories;
 
 namespace Padel.Application.Services
 {
     public class TeamService : ITeamService
     {
-
         private readonly ITeamRepository _teamRepository;
-        private readonly IValidator<Team> _teamValidator;
 
-        public TeamService(ITeamRepository teamRepository, IValidator<Team> teamValidator)
+        public TeamService(ITeamRepository teamRepository)
         {
             _teamRepository = teamRepository;
-            _teamValidator = teamValidator;
         }
 
-        public async  Task<bool> CreateAsync(Team team)
+        public async Task<bool> CreateAsync(Team team, CancellationToken token = default)
         {
-            await _teamValidator.ValidateAndThrowAsync(team);
-            return await _teamRepository.CreateAsync(team);
+            // Team validation occurs in the Team model
+            return await _teamRepository.CreateAsync(team, token);
         }
 
-        public Task<bool> DeleteByIdAsync(Guid id)
+        public Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default)
         {
-            return _teamRepository.DeleteByIdAsync(id);
+            return _teamRepository.DeleteByIdAsync(id, token);
         }
 
-        public Task<IEnumerable<Team>> GetAllAsync()
+        public Task<IEnumerable<Team>> GetAllAsync(CancellationToken token = default)
         {
-            return _teamRepository.GetAllAsync();
+            return _teamRepository.GetAllAsync(token);
         }
 
-        public Task<Team?> GetByIdAsync(Guid id)
+        public Task<Team?> GetByIdAsync(Guid id, CancellationToken token = default)
         {
-            return _teamRepository.GetByIdAsync(id);
+            return _teamRepository.GetByIdAsync(id, token);
         }
 
-        public async Task<Team?> UpdateAsync(Team team)
-        {   
-            await _teamValidator.ValidateAndThrowAsync(team);
-            var teamExists = await _teamRepository.ExistsByIdAsync(team.Id);
+        public async Task<Team?> UpdateAsync(Team team, CancellationToken token = default)
+        {
+            // Team validation occurs in the Team model
+            var teamExists = await _teamRepository.ExistsByIdAsync(team.Id,token);
             if (!teamExists) return null;
 
-            await _teamRepository.UpdateAsync(team);
-
+            await _teamRepository.UpdateAsync(team, token);
             return team;
         }
     }

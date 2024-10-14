@@ -8,9 +8,7 @@ namespace Padel.Contracts.Requests.Match
 {
     public class MatchUpdateRequest
     {
-        public Guid Id { get; set; } // Unique identifier of the match
-        public Guid SeasonId { get; set; } // Link to the season
-        public List<Guid> TeamIds { get; set; } // List of team IDs participating in the match
-        public DateTime MatchDate { get; set; } // Scheduled match date
+        public Guid SeasonId { get; init; } // Link to the season
+        public DateTime MatchDate { get; init; } // Scheduled match date
     }
 }

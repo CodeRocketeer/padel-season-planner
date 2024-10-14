@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Padel.Contract.Responses.Season
+namespace Padel.Contracts.Responses.Season
 {
     public class SeasonsResponse
     {

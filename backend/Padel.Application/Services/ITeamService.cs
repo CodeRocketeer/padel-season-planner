@@ -1,4 +1,4 @@
-﻿using Padel.Application.Models;
+﻿
 using Padel.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -12,14 +12,14 @@ namespace Padel.Application.Services
     {
 
 
-        Task<bool> CreateAsync(Team team);
+        Task<bool> CreateAsync(Team team, CancellationToken token = default);
 
-        Task<Team?> GetByIdAsync(Guid id);
+        Task<Team?> GetByIdAsync(Guid id, CancellationToken token = default);
 
-        Task<IEnumerable<Team>> GetAllAsync();
+        Task<IEnumerable<Team>> GetAllAsync(CancellationToken token = default);
 
-        Task<Team?> UpdateAsync(Team team);
+        Task<Team?> UpdateAsync(Team team, CancellationToken token = default);
 
-        Task<bool> DeleteByIdAsync(Guid id);
+        Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default);
     }
 }

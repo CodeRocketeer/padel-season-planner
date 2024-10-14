@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Contracts", "Padel.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Api", "Padel.Api\Padel.Api.csproj", "{0EF63FE6-851F-44CE-9113-9F583EBEA82C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1DC792B8-4D94-442B-ACA8-45CA523671FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Domain", "Padel.Domain\Padel.Domain.csproj", "{E437F8CC-FB4A-4B14-9AD6-9CF78E3B46C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Padel.Application.Tests", "Padel.Application.Tests\Padel.Application.Tests.csproj", "{4D932E5B-B647-47BB-99CB-376972E0F29A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Tests", "Padel.Tests\Padel.Tests.csproj", "{3D1B47D7-653F-4BEC-BB46-F99D01A000A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Padel.Infrastructure", "Padel.Infrastructure\Padel.Infrastructure.csproj", "{F17E0162-3386-4E1B-8E5B-D7C3D2A98D7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,16 +33,21 @@ Global
 		{0EF63FE6-851F-44CE-9113-9F583EBEA82C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EF63FE6-851F-44CE-9113-9F583EBEA82C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EF63FE6-851F-44CE-9113-9F583EBEA82C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D932E5B-B647-47BB-99CB-376972E0F29A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D932E5B-B647-47BB-99CB-376972E0F29A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D932E5B-B647-47BB-99CB-376972E0F29A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D932E5B-B647-47BB-99CB-376972E0F29A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E437F8CC-FB4A-4B14-9AD6-9CF78E3B46C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E437F8CC-FB4A-4B14-9AD6-9CF78E3B46C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E437F8CC-FB4A-4B14-9AD6-9CF78E3B46C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E437F8CC-FB4A-4B14-9AD6-9CF78E3B46C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D1B47D7-653F-4BEC-BB46-F99D01A000A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D1B47D7-653F-4BEC-BB46-F99D01A000A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D1B47D7-653F-4BEC-BB46-F99D01A000A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D1B47D7-653F-4BEC-BB46-F99D01A000A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F17E0162-3386-4E1B-8E5B-D7C3D2A98D7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F17E0162-3386-4E1B-8E5B-D7C3D2A98D7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F17E0162-3386-4E1B-8E5B-D7C3D2A98D7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F17E0162-3386-4E1B-8E5B-D7C3D2A98D7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{4D932E5B-B647-47BB-99CB-376972E0F29A} = {1DC792B8-4D94-442B-ACA8-45CA523671FA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {348EA309-BEFE-4850-A497-C3AB665ED9BA}
