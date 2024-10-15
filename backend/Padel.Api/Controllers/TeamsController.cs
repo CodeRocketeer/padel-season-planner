@@ -1,76 +1,60 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Padel.Api.Mapping;
-using Padel.Application.Models;
-using Padel.Application.Repositories;
+
+using Padel.Application.Services;
 using Padel.Contracts.Requests.Team;
 
 namespace Padel.Api.Controllers
 {
-
     [ApiController]
     public class TeamsController : ControllerBase
     {
-        private readonly ITeamRepository _teamRepository;
+        private readonly ITeamService _teamService;
 
-        public TeamsController(ITeamRepository teamRepository)
+        public TeamsController(ITeamService teamService)
         {
-            _teamRepository = teamRepository;
+            _teamService = teamService;
         }
 
-
         [HttpPost(ApiEndpoints.Teams.Create)]
-        public async Task<IActionResult> Create([FromBody]CreateTeamRequest request)
+        public async Task<IActionResult> Create([FromBody] TeamCreateRequest request, 
+            CancellationToken token)
         {
             var team = request.MapToTeam();
-            var result = await _teamRepository.CreateAsync(team);
+            var result = await _teamService.CreateAsync(team, token);
             return CreatedAtAction(nameof(Get), new { id = team.Id }, team.MapToResponse());
-          
-
         }
 
         [HttpGet(ApiEndpoints.Teams.Get)]
-        public async Task<IActionResult> Get([FromRoute] Guid id)
+        public async Task<IActionResult> Get([FromRoute] Guid id, CancellationToken token)
         {
-            var team = await _teamRepository.GetByIdAsync(id);
-
+            var team = await _teamService.GetByIdAsync(id, token);
             if (team is null) return NotFound();
-            var response = team.MapToResponse();
-            return Ok(response);
+            return Ok(team.MapToResponse());
         }
 
         [HttpGet(ApiEndpoints.Teams.GetAll)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken token)
         {
-            var teams = await _teamRepository.GetAllAsync();
-            var moviesResponse = teams.MapToResponse();
-            return Ok(moviesResponse);
+            var teams = await _teamService.GetAllAsync(token);
+            return Ok(teams.MapToResponse());
         }
 
         [HttpPut(ApiEndpoints.Teams.Update)]
-        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateTeamRequest request)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] TeamUpdateRequest request, CancellationToken token)
         {
             var team = request.MapToTeam(id);
-            var updated = await _teamRepository.UpdateAsync(team);
-
-           if (!updated) return NotFound();
-
-            var response = team.MapToResponse();
-            return Ok(response);
-
+            var updatedTeam = await _teamService.UpdateAsync(team, token);
+            if (updatedTeam is null) return NotFound();
+            return Ok(updatedTeam.MapToResponse());
         }
 
         [HttpDelete(ApiEndpoints.Teams.Delete)]
-        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken token)
         {
-            var deleted = await _teamRepository.DeleteByIdAsync(id);
-
+            var deleted = await _teamService.DeleteByIdAsync(id,token);
             if (!deleted) return NotFound();
-
             return Ok();
-
         }
-
-
     }
 }

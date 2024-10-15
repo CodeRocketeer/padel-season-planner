@@ -4,13 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Padel.Contracts.Requests.Player
+namespace Padel.Contracts.Responses.Team
 {
     public class TeamsResponse
     {
-
-           public required IEnumerable<TeamResponse> Items { get; set; } = Enumerable.Empty<TeamResponse>();
-
-
+        public required IEnumerable<TeamResponse> Items { get; set; } = Enumerable.Empty<TeamResponse>();
     }
+
 }
+
+
+
+
+
+
+
