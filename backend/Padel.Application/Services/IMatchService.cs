@@ -23,7 +23,7 @@ namespace Padel.Application.Services
 
         Task<IEnumerable<Match>> GetAllBySeasonIdAsync(Guid seasonId, CancellationToken token = default);
 
-
+        Task<IEnumerable<Match>> GenerateBalancedMatchesForSeason(List<Team> teams, Season season, List<Player> players, CancellationToken token = default);
 
     }
 }

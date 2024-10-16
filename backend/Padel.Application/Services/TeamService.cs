@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Padel.Domain.Models;
+﻿using FluentValidation;
 using Padel.Application.Repositories;
+using Padel.Domain.Models;
 
 namespace Padel.Application.Services
 {
     public class TeamService : ITeamService
     {
         private readonly ITeamRepository _teamRepository;
+        private readonly IValidator<Team> _teamValidator;
 
-        public TeamService(ITeamRepository teamRepository)
+        public TeamService(ITeamRepository teamRepository, IValidator<Team> teamValidator)
         {
             _teamRepository = teamRepository;
+            _teamValidator = teamValidator;
         }
 
         public async Task<bool> CreateAsync(Team team, CancellationToken token = default)
@@ -39,7 +39,7 @@ namespace Padel.Application.Services
         public async Task<Team?> UpdateAsync(Team team, CancellationToken token = default)
         {
             // Team validation occurs in the Team model
-            var teamExists = await _teamRepository.ExistsByIdAsync(team.Id,token);
+            var teamExists = await _teamRepository.ExistsByIdAsync(team.Id, token);
             if (!teamExists) return null;
 
             await _teamRepository.UpdateAsync(team, token);
@@ -51,9 +51,10 @@ namespace Padel.Application.Services
             return _teamRepository.GetAllBySeasonIdAsync(seasonId, token);
         }
 
-        // non repository methods
-        // Generate all unique pairs of players to create teams (CHECKED)
-        public List<Team> GenerateTeamsForSeason(Season season, IEnumerable<Player> players)
+        // NON REPOSITORY METHODS
+
+        // Generate all unique pairs of players to create teams
+        public Task<List<Team>> GenerateTeamsForSeason(Season season, IEnumerable<Player> players, CancellationToken token = default)
         {
             var teams = new List<Team>();
             var playerList = players.ToList();
@@ -69,31 +70,40 @@ namespace Padel.Application.Services
                         SeasonId = season.Id,
                         Player1Id = playerList[i].Id,
                         Player2Id = playerList[j].Id,
-                        Players = new List<Player>() { playerList[i], playerList[j] }
+                        Players = [playerList[i], playerList[j]]
                     };
 
                     teams.Add(team);
                 }
             }
 
-            // Validate the number of generated teams
-            ValidateGeneratedTeams(playerList.Count, teams);
+            // Validate that the number of teams generated matches the expected number
+            if (!ValidateTeamCountMatchesExpectedCount(playerList.Count, teams))
+            {
+                throw new InvalidOperationException("Invalid number of teams generated.");
+            }
 
-            return teams;
+            // Validate each team with FluentValidation
+            foreach (var team in teams)
+            {
+                _teamValidator.ValidateAndThrowAsync(team);
+            }
+
+            return Task.FromResult(teams);
         }
 
-        
-        private void ValidateGeneratedTeams(int playerCount, List<Team> teams)
+
+        private bool ValidateTeamCountMatchesExpectedCount(int playerCount, List<Team> teams)
         {
             // Calculate the expected number of teams using the combination formula: C(n, 2) = n(n-1)/2
             int expectedTeamCount = (playerCount * (playerCount - 1)) / 2;
 
             // Check if the generated number of teams matches the expected number
-            if (teams.Count != expectedTeamCount)
-            {
-                throw new InvalidOperationException($"Invalid number of teams generated. Expected {expectedTeamCount} teams, but generated {teams.Count} teams.");
-            }
+            return teams.Count == expectedTeamCount;
         }
+
+
+
 
 
 

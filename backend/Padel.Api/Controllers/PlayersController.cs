@@ -72,7 +72,7 @@ namespace Padel.Api.Controllers
         public async Task<IActionResult> SeedPlayersForSeason([FromRoute] Guid seasonId, CancellationToken token)
         {
 
-            var result = await _playerService.SeedPlayersAsync(seasonId, amountOfPlayers: 10, token);
+            var result = await _playerService.SeedPlayersAsync(seasonId, amountOfPlayers: 40, token);
 
             if (!result) return NotFound();
 

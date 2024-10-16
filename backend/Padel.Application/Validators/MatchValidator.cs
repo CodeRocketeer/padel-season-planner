@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Padel.Application.Repositories;
 using Padel.Domain.Models;
 
 namespace Padel.Application.Validators
@@ -9,7 +8,7 @@ namespace Padel.Application.Validators
 
         public MatchValidator()
         {
-         
+
             RuleFor(match => match.Team1Id)
                 .NotEmpty()
                 .WithMessage("Team1Id is required");
@@ -21,7 +20,6 @@ namespace Padel.Application.Validators
             RuleFor(match => match.SeasonId)
                 .NotEmpty()
                 .WithMessage("SeasonId is required");
-
             RuleFor(match => match.MatchDate)
                 .NotEmpty()
                 .WithMessage("MatchDate is required")
@@ -29,7 +27,7 @@ namespace Padel.Application.Validators
             RuleFor(match => match)
                 .Must(NoSharedPlayersBetweenTeams)
                 .WithMessage("A player cannot be in both teams for the same match.");
-            
+
 
 
         }
