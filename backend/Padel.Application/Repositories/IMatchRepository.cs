@@ -20,7 +20,7 @@ namespace Padel.Application.Repositories
 
         Task<IEnumerable<Match>> GetBySeasonIdAsync(Guid seasonId, CancellationToken token = default);
 
-        Task<bool> CreateMatchesAsync(IEnumerable<Match> matches, CancellationToken token = default);
+        Task<bool> CreateManyAsync(IEnumerable<Match> matches, CancellationToken token = default);
     }
 
 

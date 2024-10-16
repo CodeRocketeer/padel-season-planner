@@ -16,5 +16,10 @@ namespace Padel.Application.Repositories
         Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default);
 
         Task<bool> ExistsByIdAsync(Guid id, CancellationToken token = default);
+
+        Task<bool> CreateManyAsync(IEnumerable<Player> players = null, CancellationToken token = default);
+
+        Task<IEnumerable<Player>> GetBySeasonIdAsync(Guid seasonId, CancellationToken token = default); // IEnumerable<Player>>
+
     }
 }

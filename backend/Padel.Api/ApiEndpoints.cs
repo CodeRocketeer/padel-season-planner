@@ -12,6 +12,8 @@
             public const string GetAll = Base;
             public const string Update = $"{Base}/{{id:guid}}";
             public const string Delete = $"{Base}/{{id:guid}}";
+            // confirm season
+            public const string ConfirmSeason = $"{Base}/{{id:guid}}/confirm";
         }
 
         public static class Matches
@@ -43,6 +45,8 @@
             public const string GetAll = Base;
             public const string Update = $"{Base}/{{id:guid}}";
             public const string Delete = $"{Base}/{{id:guid}}";
+            // seeder for testing
+            public const string Seed = $"{Base}/{{seasonId:guid}}/seed";
         }
 
 

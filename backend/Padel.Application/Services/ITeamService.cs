@@ -21,5 +21,8 @@ namespace Padel.Application.Services
         Task<Team?> UpdateAsync(Team team, CancellationToken token = default);
 
         Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default);
+        List<Team> GenerateTeamsForSeason(Season season, IEnumerable<Player> players);
+
+        Task<IEnumerable<Team>> GetAllBySeasonIdAsync(Guid seasonId, CancellationToken token = default); // <--->
     }
 }

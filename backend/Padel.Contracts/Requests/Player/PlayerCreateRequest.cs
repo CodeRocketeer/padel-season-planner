@@ -11,5 +11,7 @@ namespace Padel.Contracts.Requests.Player
         public string Name { get; init; }
         public Guid UserId { get; init; }
         public string Sex { get; init; }
+
+        public Guid SeasonId { get; init; }
     }
 }

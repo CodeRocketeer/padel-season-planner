@@ -1,182 +1,164 @@
-﻿using Dapper;
-using Padel.Application.Database;
-using Padel.Domain.Models;
+﻿using Padel.Domain.Models;
+using Padel.Infrastructure.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Padel.Application.Repositories
 {
     public class MatchRepository : IMatchRepository
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
-
-        public MatchRepository(IDbConnectionFactory dbConnectionFactory)
-        {
-            _dbConnectionFactory = dbConnectionFactory;
-        }
+        // Using a collection of MatchEntity instead of a ConcurrentDictionary
+        private readonly List<MatchEntity> _matchEntities = new();
 
         // Create a new match
-        public async Task<bool> CreateAsync(Match match, CancellationToken token = default)
+        public Task<bool> CreateAsync(Match match, CancellationToken token = default)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-            using var transaction = connection.BeginTransaction();
-
-            // Check if the season exists
-            var seasonExists = await connection.ExecuteScalarAsync<bool>(
-                "SELECT COUNT(1) FROM Seasons WHERE id = @SeasonId",
-                new { SeasonId = match.SeasonId },
-                transaction
-            );
-
-            if (!seasonExists)
+            // Check if a MatchEntity with the same Id already exists
+            if (_matchEntities.Any(m => m.Id == match.Id))
             {
-                // If the season does not exist, return false and don't create the match
-                transaction.Rollback();
-                return false;
+                return Task.FromResult(false); // Match already exists
             }
 
-            // Create the match if the season exists
-            var entity = new
+            // Create a MatchEntity from the Match model
+            var entity = new MatchEntity
             {
                 Id = match.Id,
                 SeasonId = match.SeasonId,
-                MatchDate = match.MatchDate
+                Date = match.MatchDate,
+                Team1Id = match.Team1Id,
+                Team2Id = match.Team2Id
             };
 
-            var result = await connection.ExecuteAsync(new CommandDefinition(@"
-                INSERT INTO Matches (id, season_id, match_date) 
-                VALUES (@Id, @SeasonId, @MatchDate)",
-                entity,
-                transaction
-            ));
+            //// Check if the season exists (in a real scenario, this check would be against a seasons collection)
+            //if (!_matchEntities.Any(m => m.SeasonId == match.SeasonId))
+            //{
+            //    return Task.FromResult(false); // Season does not exist
+            //}
 
-            transaction.Commit();
-            return result > 0;
+            _matchEntities.Add(entity); // Add the new MatchEntity
+            return Task.FromResult(true); // Return success
         }
 
         // Delete a match by its Id
-        public async Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default)
+        public Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-            var result = await connection.ExecuteAsync(
-                "DELETE FROM Matches WHERE id = @Id;",
-                new { Id = id }
-            );
-
-            return result > 0; // Returns true if a row was deleted
+            var removedCount = _matchEntities.RemoveAll(m => m.Id == id);
+            return Task.FromResult(removedCount > 0); // Returns true if a match was deleted
         }
 
         // Check if a match exists by its Id
-        public async Task<bool> ExistsByIdAsync(Guid id, CancellationToken token = default)
+        public Task<bool> ExistsByIdAsync(Guid id, CancellationToken token = default)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-            var count = await connection.ExecuteScalarAsync<int>(
-                "SELECT COUNT(1) FROM Matches WHERE id = @Id;",
-                new { Id = id }
-            );
-
-            return count > 0; // Returns true if the match exists
+            return Task.FromResult(_matchEntities.Any(m => m.Id == id)); // Returns true if the match exists
         }
 
         // Get all matches
-        public async Task<IEnumerable<Match>> GetAllAsync(CancellationToken token = default)
+        public Task<IEnumerable<Match>> GetAllAsync(CancellationToken token = default)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-            var result = await connection.QueryAsync<Match>(
-                "SELECT id, season_id as SeasonId, match_date as MatchDate FROM Matches"
-            );
+            var result = _matchEntities.Select(entity => new Match
+            {
+                Id = entity.Id,
+                SeasonId = entity.SeasonId,
+                MatchDate = entity.Date,
+                Team1Id = entity.Team1Id,
+                Team2Id = entity.Team2Id,
+            }).ToList();
 
-            return result.ToList();
+            return Task.FromResult<IEnumerable<Match>>(result);
         }
 
         // Get a match by its Id
-        public async Task<Match?> GetByIdAsync(Guid id, CancellationToken token = default)
+        public Task<Match?> GetByIdAsync(Guid id, CancellationToken token = default)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-            var match = await connection.QuerySingleOrDefaultAsync<Match>(
-                "SELECT id, season_id as SeasonId, match_date as MatchDate FROM Matches WHERE id = @Id",
-                new { Id = id }
-            );
-
-            return match;
+            var matchEntity = _matchEntities.SingleOrDefault(m => m.Id == id);
+            return Task.FromResult(matchEntity == null ? null : new Match
+            {
+                Id = matchEntity.Id,
+                SeasonId = matchEntity.SeasonId,
+                MatchDate = matchEntity.Date,
+                Team1Id = matchEntity.Team1Id,
+                Team2Id = matchEntity.Team2Id
+            });
         }
 
         // Update an existing match
-        public async Task<bool> UpdateAsync(Match match, CancellationToken token = default)
+        public Task<bool> UpdateAsync(Match match, CancellationToken token = default)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+            // Find the index of the MatchEntity to update
+            var matchIndex = _matchEntities.FindIndex(m => m.Id == match.Id);
+            if (matchIndex == -1) return Task.FromResult(false); // Match not found
 
-            // Check if the season exists
-            var seasonExists = await connection.ExecuteScalarAsync<bool>(
-                "SELECT COUNT(1) FROM Seasons WHERE id = @SeasonId",
-                new { SeasonId = match.SeasonId }
-            );
+            // Update the existing MatchEntity
+            var existingMatchEntity = _matchEntities[matchIndex];
+            existingMatchEntity.SeasonId = match.SeasonId; // Assuming SeasonId can be updated
+            existingMatchEntity.Date = match.MatchDate; // Update the match date
 
-            if (!seasonExists)
-            {
-                // If the season does not exist, return false and don't update the match
-                return false;
-            }
-
-            var entity = new
-            {
-                Id = match.Id,
-                SeasonId = match.SeasonId,
-                MatchDate = match.MatchDate
-            };
-
-            var result = await connection.ExecuteAsync(@"
-                UPDATE Matches 
-                SET season_id = @SeasonId, match_date = @MatchDate 
-                WHERE id = @Id;",
-                entity
-            );
-
-            return result > 0; // Returns true if the update was successful
+            return Task.FromResult(true); // Return success
         }
-
 
         // Get matches by SeasonId
-        public async Task<IEnumerable<Match>> GetBySeasonIdAsync(Guid seasonId, CancellationToken token = default)
+        public Task<IEnumerable<Match>> GetBySeasonIdAsync(Guid seasonId, CancellationToken token = default)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-            var matches = await connection.QueryAsync<Match>(
-                "SELECT id, season_id as SeasonId, match_date as MatchDate FROM Matches WHERE season_id = @SeasonId",
-                new { SeasonId = seasonId }
-            );
+            var result = _matchEntities
+                .Where(m => m.SeasonId == seasonId)
+                .Select(entity => new Match
+                {
+                    Id = entity.Id,
+                    SeasonId = entity.SeasonId,
+                    MatchDate = entity.Date,
+                    Team1Id = entity.Team1Id,
+                    Team2Id = entity.Team2Id
+                }).ToList();
 
-            return matches.ToList();
+            return Task.FromResult<IEnumerable<Match>>(result);
         }
 
-        public async Task<bool> CreateMatchesAsync(IEnumerable<Match> matches, CancellationToken token = default)
+        // Bulk create matches
+        public Task<bool> CreateManyAsync(IEnumerable<Match> matches, CancellationToken token = default)
         {
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-            using var transaction = connection.BeginTransaction();
+            var addedMatches = 0;
 
-            try
+            foreach (var match in matches)
             {
-            
+                Console.WriteLine($"Processing Match: Id={match.Id}, SeasonId={match.SeasonId}, MatchDate={match.MatchDate}");
 
-                // Prepare entities for bulk insert
-                var matchEntities = matches.Select(match => new
+                // Check if a MatchEntity with the same Id already exists
+                if (_matchEntities.Any(m => m.Id == match.Id))
+                {
+                    Console.WriteLine($"Match with Id {match.Id} already exists, skipping.");
+                    continue; // Match already exists
+                }
+
+                // Create a MatchEntity from the Match model
+                var entity = new MatchEntity
                 {
                     Id = match.Id,
                     SeasonId = match.SeasonId,
-                    MatchDate = match.MatchDate
-                }).ToList();
+                    Date = match.MatchDate, 
+                    Team1Id = match.Team1Id,
+                    Team2Id = match.Team2Id
+                };
 
-                // Bulk insert
-                var result = await connection.ExecuteAsync(@"
-            INSERT INTO Matches (id, season_id, match_date) 
-            VALUES (@Id, @SeasonId, @MatchDate);",
-                    matchEntities, transaction);
+                // Check if the season exists (this check should be improved)
+                // Example: Check against a separate seasons repository
+                // if (!_seasonRepository.ExistsById(match.SeasonId)) 
+                // {
+                //     Console.WriteLine($"Season with Id {match.SeasonId} does not exist, skipping match.");
+                //     continue; // Skip this match if the season does not exist
+                // }
 
-                transaction.Commit();
-                return result == matches.Count(); // Return true if all matches were inserted
+                // For now, let's skip this condition for testing
+                _matchEntities.Add(entity); // Add the new MatchEntity
+                addedMatches++;
+
+                Console.WriteLine($"Added Match: Id={entity.Id}, SeasonId={entity.SeasonId}, Date={entity.Date}");
             }
-            catch (Exception)
-            {
-                transaction.Rollback();
-                throw; // Rethrow the exception after rollback
-            }
+
+            Console.WriteLine($"Total Matches Attempted: {matches.Count()}, Total Matches Added: {addedMatches}");
+            return Task.FromResult(addedMatches > 0); // Return true if at least one match was inserted
         }
     }
 }

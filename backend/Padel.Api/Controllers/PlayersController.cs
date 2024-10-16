@@ -42,8 +42,8 @@ namespace Padel.Api.Controllers
         public async Task<IActionResult> GetAll(CancellationToken token)
         {
             var players = await _playerService.GetAllAsync(token);
-            var moviesResponse = players.MapToResponse();
-            return Ok(moviesResponse);
+            var playersResponse = players.MapToResponse();
+            return Ok(playersResponse);
         }
 
         [HttpPut(ApiEndpoints.Players.Update)]
@@ -66,6 +66,17 @@ namespace Padel.Api.Controllers
 
             return Ok();
 
+        }
+
+        [HttpPost(ApiEndpoints.Players.Seed)]
+        public async Task<IActionResult> SeedPlayersForSeason([FromRoute] Guid seasonId, CancellationToken token)
+        {
+
+            var result = await _playerService.SeedPlayersAsync(seasonId, amountOfPlayers: 10, token);
+
+            if (!result) return NotFound();
+
+            return Ok();
         }
 
 

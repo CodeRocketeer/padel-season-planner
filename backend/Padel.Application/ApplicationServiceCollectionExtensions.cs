@@ -15,10 +15,10 @@ namespace Padel.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            services.AddSingleton<ITeamRepository , TeamRepository>();
-            services.AddSingleton<IPlayerRepository , PlayerRepository>();
-            services.AddSingleton<IMatchRepository , MatchRepository>();
-            services.AddSingleton<ISeasonRepository , SeasonRepository>();
+            services.AddSingleton<IMatchRepository, MatchRepository>(); // Register MatchRepository first
+            services.AddSingleton<ISeasonRepository, SeasonRepository>(); // Then register SeasonRepository
+            services.AddSingleton<ITeamRepository, TeamRepository>();
+            services.AddSingleton<IPlayerRepository, PlayerRepository>();
             services.AddSingleton<ITeamService, TeamService>();
             services.AddSingleton<IPlayerService, PlayerService>();
             services.AddSingleton<IMatchService, MatchService>();
@@ -27,12 +27,11 @@ namespace Padel.Application
 
             return services;
         }
-
-        public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
-        {
-            services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlConnectionFactory(connectionString));
-            services.AddSingleton<DbInitializer>();
-            return services;
-        }
+        //public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
+        //{
+        //    services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlConnectionFactory(connectionString));
+        //    services.AddSingleton<DbInitializer>();
+        //    return services;
+        //}
     }
 }

@@ -1,44 +1,40 @@
-﻿public class Player
+﻿namespace Padel.Domain.Models
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
-    public Guid UserId { get; private set; }
-    public string Name { get; private set; }
-    public string Sex { get; private set; }
-
-    public Player(Guid id, Guid userId, string name, string sex)
+    public class Player
     {
-        ValidatePlayer(name, sex);
+        public required Guid Id { get; set; }
+        public required Guid UserId { get; set; }
+        public required string? Name { get; set; }
+        public required string? Sex { get; set; }
 
-        Id = id;
-        UserId = userId;
-        Name = name;
-        Sex = sex;
-    }
+        public required Guid SeasonId { get; set; }
 
-    // Update player details
-    public void UpdatePlayer(string name, string sex)
-    {
-        ValidatePlayer(name, sex);
 
-        Name = name;
-        Sex = sex;
-    }
-
-    private void ValidatePlayer(string name, string sex)
-    {
-        if (string.IsNullOrWhiteSpace(name))
+        // Update player details
+        public void UpdatePlayer(string name, string sex)
         {
-            throw new ArgumentException("Name must not be empty.", nameof(name));
+            ValidatePlayer(name, sex);
+
+            Name = name;
+            Sex = sex;
         }
 
-        if (string.IsNullOrWhiteSpace(sex))
+        private void ValidatePlayer(string name, string sex)
         {
-            throw new ArgumentException("Sex must not be empty.", nameof(sex));
-        }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Name must not be empty.", nameof(name));
+            }
 
-        if (sex != "M" && sex != "F")
-        {
-            throw new ArgumentException("Sex must be either 'M' or 'F'.", nameof(sex));
+            if (string.IsNullOrWhiteSpace(sex))
+            {
+                throw new ArgumentException("Sex must not be empty.", nameof(sex));
+            }
+
+            if (sex != "M" && sex != "F")
+            {
+                throw new ArgumentException("Sex must be either 'M' or 'F'.", nameof(sex));
+            }
         }
     }
 }

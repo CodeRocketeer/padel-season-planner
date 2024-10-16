@@ -15,7 +15,7 @@ namespace Padel.Api.Mapping
 
         public static Team MapToTeam(this TeamCreateRequest request)
         {
-            return new Team(Guid.NewGuid(), request.SeasonId, request.Player1Id, request.Player2Id);
+            return new Team { Id = Guid.NewGuid(), SeasonId = request.SeasonId, Player1Id = request.Player1Id, Player2Id = request.Player2Id };
         }
 
         public static TeamResponse MapToResponse(this Team team)
@@ -26,6 +26,7 @@ namespace Padel.Api.Mapping
                 SeasonId = team.SeasonId,
                 Player1Id = team.Player1Id,
                 Player2Id = team.Player2Id,
+
             };
         }
 
@@ -39,7 +40,7 @@ namespace Padel.Api.Mapping
 
         public static Team MapToTeam(this TeamUpdateRequest request, Guid id)
         {
-            return new Team(id, request.SeasonId, request.Player1Id, request.Player2Id);
+            return new Team { Id = id, SeasonId = request.SeasonId, Player1Id = request.Player1Id, Player2Id = request.Player2Id };
         }
 
         // Player mapping
@@ -47,7 +48,7 @@ namespace Padel.Api.Mapping
         public static Player MapToPlayer(this PlayerCreateRequest request)
         {
 
-            return new Player(Guid.NewGuid(), request.UserId, request.Name, request.Sex);
+            return new Player { Id = Guid.NewGuid(), UserId = request.UserId, Name = request.Name, Sex = request.Sex, SeasonId = request.SeasonId };
 
         }
 
@@ -57,7 +58,9 @@ namespace Padel.Api.Mapping
             {
                 Id = player.Id,
                 Name = player.Name,
-                Sex = player.Sex
+                Sex = player.Sex,
+                UserId = player.UserId,
+                SeasonId = player.SeasonId
             };
         }
 
@@ -71,7 +74,7 @@ namespace Padel.Api.Mapping
 
         public static Player MapToPlayer(this PlayerUpdateRequest request, Guid id)
         {
-            return new Player(id, request.UserId, request.Name, request.Sex);
+            return new Player { Id = id, UserId = request.UserId, Name = request.Name, Sex = request.Sex, SeasonId = request.SeasonId };
 
         }
 
@@ -80,7 +83,7 @@ namespace Padel.Api.Mapping
         public static Match MapToMatch(this MatchCreateRequest request)
         {
 
-            return new Match { Id = Guid.NewGuid(), SeasonId = request.SeasonId, MatchDate = request.MatchDate };
+            return new Match { Id = Guid.NewGuid(), SeasonId = request.SeasonId, MatchDate = request.MatchDate, Team1Id = request.Team1Id, Team2Id = request.Team2Id };
 
         }
 
@@ -90,7 +93,11 @@ namespace Padel.Api.Mapping
             {
                 Id = match.Id,
                 SeasonId = match.SeasonId,
-                MatchDate = match.MatchDate
+                MatchDate = match.MatchDate,
+                Team1Id = match.Team1Id,
+                Team2Id = match.Team2Id,
+                Teams = match.Teams.Select(MapToResponse).ToList()
+                
             };
         }
 
@@ -104,7 +111,7 @@ namespace Padel.Api.Mapping
 
         public static Match MapToMatch(this MatchUpdateRequest request, Guid id)
         {
-            return new Match { Id = id, SeasonId = request.SeasonId, MatchDate = request.MatchDate };
+            return new Match { Id = id, SeasonId = request.SeasonId, MatchDate = request.MatchDate, Team1Id = request.Team1Id, Team2Id = request.Team2Id };
 
         }
 

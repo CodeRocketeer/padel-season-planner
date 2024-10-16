@@ -1,58 +1,50 @@
-﻿namespace Padel.Tests.Models
+﻿using Padel.Domain.Models;
+namespace Padel.Tests.Models
 {
-    public class SeasonModelTests
+    public class TeamModelTests
     {
         [Fact]
-        public void Season_Should_Set_Properties_Correctly()
+        public void Team_Should_Have_RequiredProperties()
         {
             // Arrange
-            var seasonId = Guid.NewGuid();
-            var startDate = new DateTime(2024, 1, 1);
-            var amountOfMatches = 5;
-            var seasonName = "2024 Season";
-            var dayOfWeek = (int)DayOfWeek.Monday; // Assuming DayOfWeek is stored as an int
-
-            // Act
-            var season = new Season
+            var team = new Team
             {
-                Id = seasonId,
-                StartDate = startDate,
-                AmountOfMatches = amountOfMatches,
-                Name = seasonName,
-                DayOfWeek = dayOfWeek
+                Id = Guid.NewGuid(),
+                SeasonId = Guid.NewGuid(),
+                Player1Id = Guid.NewGuid(),
+                Player2Id = Guid.NewGuid()
             };
 
-            // Assert
-            Assert.Equal(seasonId, season.Id);
-            Assert.Equal(startDate, season.StartDate);
-            Assert.Equal(amountOfMatches, season.AmountOfMatches);
-            Assert.Equal(seasonName, season.Name);
-            Assert.Equal(dayOfWeek, season.DayOfWeek);
-
-
+            // Act & Assert
+            Assert.NotEqual(Guid.Empty, team.Id);
+            Assert.NotEqual(Guid.Empty, team.SeasonId);
+            Assert.NotEqual(Guid.Empty, team.Player1Id);
+            Assert.NotEqual(Guid.Empty, team.Player2Id);
         }
 
         [Fact]
-        public void Season_Should_Throw_Exception_When_DayOfWeek_Is_Out_Of_Range()
+        public void Team_Should_AddPlayers()
         {
             // Arrange
-            var seasonId = Guid.NewGuid();
-            var startDate = new DateTime(2024, 1, 1);
-            var amountOfMatches = 5;
-            var dayOfWeek = 7;
-            var name = "2024 Season";
-
-
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Season
+            var team = new Team
             {
-                Id = seasonId,
-                StartDate = startDate,
-                AmountOfMatches = amountOfMatches,
-                Name = name,
-                DayOfWeek = dayOfWeek
-            });
+                Id = Guid.NewGuid(),
+                SeasonId = Guid.NewGuid(),
+                Player1Id = Guid.NewGuid(),
+                Player2Id = Guid.NewGuid()
+            };
 
+            var player1 = new Player{ Id = team.Player1Id, Name = "Player 1", Sex = "M", SeasonId = team.SeasonId, UserId = Guid.NewGuid() };
+            var player2 = new Player { Id = team.Player2Id, Name = "Player 2", Sex = "F", SeasonId = team.SeasonId, UserId = Guid.NewGuid() };
 
+            // Act
+            team.Players.Add(player1);
+            team.Players.Add(player2);
+
+            // Assert
+            Assert.Equal(2, team.Players.Count);
+            Assert.Contains(player1, team.Players);
+            Assert.Contains(player2, team.Players);
         }
 
 

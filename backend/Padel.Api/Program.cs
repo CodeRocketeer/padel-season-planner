@@ -13,7 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication();
-builder.Services.AddDatabase(config["Database:ConnectionString"]!);
+//builder.Services.AddDatabase(config["Database:ConnectionString"]!);
 
 var app = builder.Build();
 
@@ -31,8 +31,8 @@ app.UseAuthorization();
 app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapControllers();
 
-var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
-await dbInitializer.InitializeAsync();
+//var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
+//await dbInitializer.InitializeAsync();
 
 
 app.Run();

@@ -21,5 +21,7 @@ namespace Padel.Application.Services
         Task<Season?> UpdateAsync(Season season, CancellationToken token = default);
 
         Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default);
+
+        Task<bool> PopulateSeasonAsync(Guid id, CancellationToken token = default);
     }
 }

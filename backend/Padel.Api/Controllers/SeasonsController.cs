@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Padel.Api.Mapping;
-using Padel.Application.Repositories;
 using Padel.Application.Services;
 using Padel.Contracts.Requests.Season;
-using Padel.Contracts.Responses.Season;
 
 namespace Padel.Api.Controllers
 {
@@ -23,10 +21,14 @@ namespace Padel.Api.Controllers
         public async Task<IActionResult> Create([FromBody] SeasonCreateRequest request, CancellationToken token)
         {
             var season = request.MapToSeason();
+
+            season.StartDate = DateTime.Now;
+            season.AmountOfMatches = 20;
+            season.DayOfWeek = 2;
+
+
             var result = await _seasonService.CreateAsync(season, token);
             return CreatedAtAction(nameof(Get), new { id = season.Id }, season.MapToResponse());
-
-
         }
 
         [HttpGet(ApiEndpoints.Seasons.Get)]
@@ -55,7 +57,6 @@ namespace Padel.Api.Controllers
 
             if (updatedSeason is null) return NotFound();
             return Ok(season.MapToResponse());
-
         }
 
         [HttpDelete(ApiEndpoints.Seasons.Delete)]
@@ -69,7 +70,18 @@ namespace Padel.Api.Controllers
 
         }
 
-     
+        [HttpPost(ApiEndpoints.Seasons.ConfirmSeason)]
+        public async Task<IActionResult> ConfirmSeason([FromRoute] Guid id, CancellationToken token)
+        {
+            var confirmed = await _seasonService.PopulateSeasonAsync(id, token);
+
+            if (!confirmed) return NotFound();
+            return Ok();
+        }
+
+
+
+
 
 
     }

@@ -3,6 +3,7 @@ using Padel.Api.Mapping;
 
 using Padel.Application.Services;
 using Padel.Contracts.Requests.Team;
+using Padel.Domain.Models;
 
 namespace Padel.Api.Controllers
 {
@@ -17,7 +18,7 @@ namespace Padel.Api.Controllers
         }
 
         [HttpPost(ApiEndpoints.Teams.Create)]
-        public async Task<IActionResult> Create([FromBody] TeamCreateRequest request, 
+        public async Task<IActionResult> Create([FromBody] TeamCreateRequest request,
             CancellationToken token)
         {
             var team = request.MapToTeam();
@@ -34,10 +35,23 @@ namespace Padel.Api.Controllers
         }
 
         [HttpGet(ApiEndpoints.Teams.GetAll)]
-        public async Task<IActionResult> GetAll(CancellationToken token)
+        public async Task<IActionResult> GetAll([FromQuery] Guid? seasonId, CancellationToken token)
         {
-            var teams = await _teamService.GetAllAsync(token);
-            return Ok(teams.MapToResponse());
+            IEnumerable<Team> teams;
+
+            // Check if the seasonId parameter is provided in the query
+            if (seasonId.HasValue)
+                teams = await _teamService.GetAllBySeasonIdAsync(seasonId.Value, token);
+            else
+                teams = await _teamService.GetAllAsync(token);
+
+            // If no teams are found, return a NotFound result
+            if (!teams.Any())
+                return NotFound();
+
+            // Map the teams to response objects and return them
+            var teamsResponse = teams.MapToResponse();
+            return Ok(teamsResponse);
         }
 
         [HttpPut(ApiEndpoints.Teams.Update)]
@@ -52,7 +66,7 @@ namespace Padel.Api.Controllers
         [HttpDelete(ApiEndpoints.Teams.Delete)]
         public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken token)
         {
-            var deleted = await _teamService.DeleteByIdAsync(id,token);
+            var deleted = await _teamService.DeleteByIdAsync(id, token);
             if (!deleted) return NotFound();
             return Ok();
         }

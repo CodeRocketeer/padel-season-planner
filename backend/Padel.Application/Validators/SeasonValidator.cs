@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Padel.Application.Repositories;
+using Padel.Domain.Models;
 
 namespace Padel.Application.Validators
 {
