@@ -1,124 +1,148 @@
-﻿using Padel.Domain.Models;
-using Padel.Infrastructure.Entities;
-using System.Data;
+﻿using Dapper;
+using Padel.Application.Database;
 
-namespace Padel.Application.Repositories
+using Padel.Application.Models;
+using Padel.Application.Repositories.Interfaces;
+
+
+namespace Padel.Application.Repositories;
+
+public class SeasonRepository : ISeasonRepository
 {
-    public class SeasonRepository : ISeasonRepository
+    private readonly IDbConnectionFactory _dbConnectionFactory;
+    private readonly IMatchRepository _matchRepository;
+
+    public SeasonRepository(IDbConnectionFactory dbConnectionFactory, IMatchRepository matchRepository)
     {
-        private readonly List<SeasonEntity> _seasons = new();
-        private readonly IMatchRepository _matchRepository; // Dependency on MatchRepository
-        private readonly ITeamRepository _teamRepository;
+        _dbConnectionFactory = dbConnectionFactory;
+        _matchRepository = matchRepository;
+    }
+
+    public async Task<bool> CreateAsync(Season Season, CancellationToken token = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
+        using var transaction = connection.BeginTransaction();
 
 
+        var result = await connection.ExecuteAsync(new CommandDefinition("""
+            insert into Seasons (id, amountOfMatches, startDate, title, dayOfWeek) 
+            values (@Id, @AmountOfMatches, @StartDate, @Title, @DayOfWeek)
+            """, Season, cancellationToken: token));
 
-        public SeasonRepository(IMatchRepository matchRepository, ITeamRepository teamRepository)
+
+        transaction.Commit();
+
+        return result > 0;
+    }
+
+    public async Task<Season?> GetByIdAsync(Guid id, Guid? userid = default, CancellationToken token = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
+        var season = await connection.QuerySingleOrDefaultAsync<Season>(
+            new CommandDefinition("""
+            select * from Seasons where id = @id
+            """, new { id }, cancellationToken: token));
+
+        if (season is null)
         {
-            _matchRepository = matchRepository; // Injecting MatchRepository
-            _teamRepository = teamRepository;
+            return null;
         }
 
+        // Todo: check in the participants table if the user is already registered
+        var isUserParticipating = await connection.ExecuteScalarAsync<bool>(
+       new CommandDefinition("""
+        select count(1) from Participants where SeasonId = @id and UserId = @userid
+        """, new { id, userid }, cancellationToken: token));
 
-        public Task<bool> CreateAsync(Season season, CancellationToken token = default)
+        season.UserParticipates = isUserParticipating;
+
+        // Fetch matches using the MatchRepository
+        var matches = await _matchRepository.GetAllAsync(new GetAllMatchesOptions { SeasonId = id }, token);
+        season.Matches = matches.ToList(); // Assuming the Matches property exists in your Season model
+
+
+        return season;
+    }
+
+    public async Task<Season?> GetBySlugAsync(string slug, Guid? userid = default, CancellationToken token = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
+        var Season = await connection.QuerySingleOrDefaultAsync<Season>(
+            new CommandDefinition("""
+            select * from Seasons where slug = @slug
+            """, new { slug }, cancellationToken: token));
+
+        if (Season is null)
         {
-            if (season.AmountOfMatches <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(season.AmountOfMatches), "Amount of matches must be greater than zero.");
-            }
-
-            var entity = new SeasonEntity
-            {
-                Id = season.Id,
-                Name = season.Name,
-                StartDate = season.StartDate,
-                DayOfWeek = season.DayOfWeek,
-                AmountOfMatches = season.AmountOfMatches
-            };
-
-            _seasons.Add(entity);
-            return Task.FromResult(true); // Simulate success
+            return null;
         }
 
-        public Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default)
+        return Season;
+    }
+
+    public async Task<IEnumerable<Season>> GetAllAsync(Guid? userid = default, CancellationToken token = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
+        var result = await connection.QueryAsync<dynamic>(new CommandDefinition("""
+        SELECT 
+            m.id AS id,
+            m.title AS title,
+            m.startdate AS startdate,
+            m.amountofmatches AS amountofmatches,
+            m.dayofweek AS dayofweek
+        FROM seasons m
+        """, cancellationToken: token));
+
+        return result.Select(x => new Season
         {
-            var entityToRemove = _seasons.FirstOrDefault(s => s.Id == id);
-            if (entityToRemove != null)
-            {
-                _seasons.Remove(entityToRemove);
-                return Task.FromResult(true); // Simulate successful deletion
-            }
+            Id = x.id,
+            Title = x.title,
+            StartDate = x.startdate,
+            AmountOfMatches = x.amountofmatches,
+            DayOfWeek = x.dayofweek
 
-            return Task.FromResult(false); // No entity found to delete
-        }
-
-        public Task<bool> ExistsByIdAsync(Guid id, CancellationToken token = default)
-        {
-            var exists = _seasons.Any(s => s.Id == id);
-            return Task.FromResult(exists);
-        }
-
-        public Task<IEnumerable<Season>> GetAllAsync(CancellationToken token = default)
-        {
-            var result = _seasons.Select(x => new Season
-            {
-                Id = x.Id,
-                Name = x.Name,
-                StartDate = x.StartDate,
-                DayOfWeek = x.DayOfWeek,
-                AmountOfMatches = x.AmountOfMatches
-
-            });
-
-            return Task.FromResult<IEnumerable<Season>>(result.ToList());
-        }
-
-        public async Task<Season?> GetByIdAsync(Guid id, CancellationToken token = default)
-        {
-            var entity = _seasons.SingleOrDefault(s => s.Id == id);
-            if (entity == null) return null; // Return null if the entity is not found
-
-            // Populate the matches using async call
-            var matches = await _matchRepository.GetBySeasonIdAsync(entity.Id, token);
-
-            var teams = await _teamRepository.GetAllBySeasonIdAsync(entity.Id, token);
-
-            // add the teams to the matches
-            foreach (var match in matches)
-            {
-                var team1 = teams.FirstOrDefault(t => t.Id == match.Team1Id);
-                var team2 = teams.FirstOrDefault(t => t.Id == match.Team2Id);
-
-                if (team1 != null && team2 != null)
-                {
-                    match.Teams = new List<Team> { team1, team2 };
-                }
-            }
+        });
+    }
 
 
-            return new Season
-            {
-                Id = entity.Id,
-                Name = entity.Name,
-                StartDate = entity.StartDate,
-                DayOfWeek = entity.DayOfWeek,
-                AmountOfMatches = entity.AmountOfMatches,
-                Matches = matches.ToList() // Convert to List if needed
-            };
-        }
+    public async Task<bool> UpdateAsync(Season Season, Guid? userid = default, CancellationToken token = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
+        using var transaction = connection.BeginTransaction();
 
-        public Task<bool> UpdateAsync(Season season, CancellationToken token = default)
-        {
-            var entityToUpdate = _seasons.FirstOrDefault(s => s.Id == season.Id);
-            if (entityToUpdate != null)
-            {
-                entityToUpdate.Name = season.Name;
-                entityToUpdate.StartDate = season.StartDate;
-                entityToUpdate.DayOfWeek = season.DayOfWeek;
-                entityToUpdate.AmountOfMatches = season.AmountOfMatches;
-                return Task.FromResult(true); // Simulate successful update
-            }
+        await connection.ExecuteAsync(new CommandDefinition("""
+           delete from Seasons where id = @Id
+           """, new { Season.Id }, cancellationToken: token));
 
-            return Task.FromResult(false); // No entity found to update
-        }
+
+
+        var result = await connection.ExecuteAsync(new CommandDefinition("""
+            insert into Seasons (id, amountOfMatches, startDate, title, dayOfWeek)
+            values (@Id, @AmountOfMatches, @StartDate, @Title, @DayOfWeek)
+            """, Season, cancellationToken: token));
+
+        transaction.Commit();
+        return result > 0;
+    }
+
+    public async Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
+        using var transaction = connection.BeginTransaction();
+
+        var result = await connection.ExecuteAsync(new CommandDefinition("""
+            delete from Seasons where id = @id
+            """, new { id }, cancellationToken: token));
+
+        transaction.Commit();
+        return result > 0;
+    }
+
+    public async Task<bool> ExistsByIdAsync(Guid id, CancellationToken token = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
+        return await connection.ExecuteScalarAsync<bool>(new CommandDefinition("""
+            select count(1) from Seasons where id = @id
+            """, new { id }, cancellationToken: token));
     }
 }

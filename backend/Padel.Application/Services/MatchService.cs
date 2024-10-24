@@ -1,256 +1,226 @@
-﻿using FluentValidation;
-using Padel.Application.Repositories;
-using Padel.Domain.Models;
+﻿using Padel.Application.Models;
+using Padel.Application.Rules;
+using Padel.Application.Services.Interfaces;
 
 namespace Padel.Application.Services
 {
     public class MatchService : IMatchService
     {
-        private readonly IMatchRepository _matchRepository;
-        private readonly ISeasonRepository _seasonRepository;
-        private readonly IValidator<Match> _matchValidator;
+        private readonly RuleSet _ruleSet;
 
-        public MatchService(IMatchRepository matchRepository, ISeasonRepository seasonRepository, IValidator<Match> matchValidator)
+
+        public MatchService(RuleSet ruleSet)
         {
-            _matchValidator = matchValidator;
-            _matchRepository = matchRepository;
-            _seasonRepository = seasonRepository;
+            _ruleSet = ruleSet;
         }
 
-        public async Task<bool> CreateAsync(Match match, CancellationToken token = default)
+        public async Task<IEnumerable<Match>> CreateBalancedMatchesForSeasonAsync(IEnumerable<Team> teams, Season season, IEnumerable<Participant> participants, CancellationToken token)
         {
-            // Match validation occurs in the Match model
-            await _matchValidator.ValidateAndThrowAsync(match, token);
-            // Check if the specified season exists
-            var seasonExists = await _seasonRepository.ExistsByIdAsync(match.SeasonId, token);
-            if (!seasonExists)
+            var scheduledMatchSets = new List<(List<Match> Matches, decimal FaultPercentage)>();
+
+            // Number of iterations to try
+            int iterations = 200;
+            // Generate all possible matches for this iteration
+            var allPossibleMatches = GeneratePossibleMatches(teams, season.Id);
+
+            // Run multiple iterations to find the best set of planned matches
+            for (int i = 0; i < iterations; i++)
             {
-                throw new InvalidOperationException("Cannot create match. The specified season does not exist.");
+                // Shuffle the possible matches to randomize the selection for this iteration
+                var shuffledMatches = ShuffleMatches(allPossibleMatches.ToList());
+                // Call the function to generate matches for this iteration
+                var (scheduledMatches, averageFaultPercentage) = CreateMatchesForSeasonIteration(teams, season, participants, shuffledMatches, token);
+
+                // Add the planned matches to the list of all planned matches
+                scheduledMatchSets.Add((scheduledMatches, averageFaultPercentage));
             }
-            // Create the match
-            return await _matchRepository.CreateAsync(match, token);
+
+            var sortedScheduledMatchSets = scheduledMatchSets.OrderBy(x => x.FaultPercentage).ToList();
+            // Now evaluate all generated schedules and find the one with the lowest fault percentage
+            var optimalScheduledMatchSet = sortedScheduledMatchSets.FirstOrDefault();  // Returns the tuple with the lowest fault percentage
+
+            // TODO: add a matchDate to each match, using the startDate and the day of the week
+            if (optimalScheduledMatchSet.Matches.Count == season.AmountOfMatches)
+            {
+                var updatedMatches = AssignMatchDates(optimalScheduledMatchSet.Matches, season.StartDate, season.DayOfWeek);
+                return updatedMatches.AsEnumerable();
+            }
+
+            // Return empty if no optimal match set is found
+            return Enumerable.Empty<Match>();
         }
 
-        public Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default)
+        private (List<Match> scheduledMatches, decimal averageFaultPercentage) CreateMatchesForSeasonIteration(IEnumerable<Team> teams, Season season, IEnumerable<Participant> participants, List<Match> shuffledMatches, CancellationToken token)
         {
-            return _matchRepository.DeleteByIdAsync(id, token);
+            var scheduledMatches = new List<Match>();
+            var faultyMatches = new List<(Match match, decimal faultPercentage)>();
+
+            // Step 1: Try to add perfect matches (validation score == 0)
+            scheduledMatches = AddPerfectMatches(shuffledMatches, scheduledMatches, faultyMatches, season, participants.ToList(), token);
+
+            // Step 2: If we don't have enough perfect matches, take from faulty matches
+            if (scheduledMatches.Count < season.AmountOfMatches && faultyMatches.Count > 0)
+            {
+                scheduledMatches = AddFaultyMatches(scheduledMatches, faultyMatches, season, token);
+            }
+
+            // Calculate the average fault percentage for this iteration
+            decimal averageFaultPercentage = CalculateAverageFaultPercentage(faultyMatches);
+
+            // Return both the planned matches and the average fault percentage
+            return (scheduledMatches, averageFaultPercentage);
         }
 
-        public Task<IEnumerable<Match>> GetAllAsync(CancellationToken token = default)
+        private static List<Match> ShuffleMatches(List<Match> allPossibleMatches)
         {
-            return _matchRepository.GetAllAsync(token);
+            var random = new Random();
+            var n = allPossibleMatches.Count;
+
+            for (int i = n - 1; i > 0; i--)
+            {
+                // Pick a random index from 0 to i
+                int j = random.Next(0, i + 1);
+
+                // Swap possibleMatches[i] with the element at random index
+                var temp = allPossibleMatches[i];
+                allPossibleMatches[i] = allPossibleMatches[j];
+                allPossibleMatches[j] = temp;
+            }
+
+            return allPossibleMatches;
         }
 
-        public Task<Match?> GetByIdAsync(Guid id, CancellationToken token = default)
+        private static decimal CalculateAverageFaultPercentage(List<(Match match, decimal faultPercentage)> faultyMatches)
         {
-            return _matchRepository.GetByIdAsync(id, token);
+            // If there are no faulty matches, return 0 to avoid division by zero
+            if (faultyMatches == null || faultyMatches.Count == 0)
+            {
+                return 0m;
+            }
+
+            // Calculate the sum of all fault percentages
+            decimal totalFaultPercentage = faultyMatches.Sum(fm => fm.faultPercentage);
+
+            // Calculate and return the average fault percentage
+            return totalFaultPercentage / faultyMatches.Count;
         }
 
-        public async Task<Match?> UpdateAsync(Match match, CancellationToken token = default)
-        {
-            // Match validation occurs in the Match model
-            await _matchValidator.ValidateAndThrowAsync(match, token);
-            // Check if the specified match exists
-            var matchExists = await _matchRepository.ExistsByIdAsync(match.Id, token);
-            if (!matchExists) return null;
 
-            // Update the match
-            await _matchRepository.UpdateAsync(match, token);
-            return match;
+        private List<Match> AddPerfectMatches(IEnumerable<Match> shuffledMatches, List<Match> scheduledMatches, List<(Match match, decimal faultPercentage)> faultyMatches, Season season, List<Participant> participants, CancellationToken token)
+        {
+
+
+            foreach (var match in shuffledMatches)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    token.ThrowIfCancellationRequested();
+                }
+
+                var validationResult = _ruleSet.Validate(match, scheduledMatches, participants);
+
+                if (validationResult == 0)
+                {
+                    // Perfect match, store in scheduled matches
+                    scheduledMatches.Add(match);
+                }
+                else
+                {
+                    faultyMatches.Add((match, validationResult));
+                }
+
+                if (scheduledMatches.Count >= season.AmountOfMatches)
+                {
+                    break; // Stop if we have enough matches
+                }
+            }
+            return scheduledMatches;
         }
 
-        public async Task<IEnumerable<Match>> GetAllBySeasonIdAsync(Guid seasonId, CancellationToken token = default)
+
+        private static List<Match> AddFaultyMatches(List<Match> scheduledMatches, List<(Match match, decimal faultPercentage)> faultyMatches, Season season, CancellationToken token)
         {
-            return await _matchRepository.GetBySeasonIdAsync(seasonId, token);
+            var sortedFaultyMatches = faultyMatches.OrderBy(m => m.faultPercentage).ToList();
+
+            foreach (var (match, faultPercentage) in sortedFaultyMatches)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    token.ThrowIfCancellationRequested();
+                }
+
+                scheduledMatches.Add(match);
+
+                if (scheduledMatches.Count >= season.AmountOfMatches)
+                {
+                    break; // Stop if we have enough matches
+                }
+            }
+
+            return scheduledMatches;
+        }
+
+        private List<Match> AssignMatchDates(List<Match> matches, DateTime startDate, int dayOfWeek)
+        {
+            // Step 1: Get the first match date based on season start date and day of the week
+            DateTime nextMatchDate = GetFirstMatchDate(startDate, dayOfWeek);
+
+            // Step 2: Assign the match dates to each match, one week apart
+            foreach (var match in matches)
+            {
+                match.MatchDate = nextMatchDate;  // Assign the calculated match date
+                nextMatchDate = nextMatchDate.AddDays(7);  // Move to the next week
+            }
+
+            // Return the updated list of matches
+            return matches;
         }
 
 
         private static DateTime GetFirstMatchDate(DateTime startDate, int dayOfWeek)
         {
-            // Get the difference between the current day of the week and the desired match day
+            // Calculate the number of days until the desired day of the week
             int daysUntilMatchDay = ((dayOfWeek - (int)startDate.DayOfWeek + 7) % 7);
 
-            // Return the first match date, which is the start date plus the calculated difference
+            // Return the first match date, which is the start date plus the calculated number of days
             return startDate.AddDays(daysUntilMatchDay);
         }
 
-        public async Task<IEnumerable<Match>> GenerateBalancedMatchesForSeason(List<Team> teams, Season season, List<Player> players, CancellationToken token = default)
+
+        // Method to generate combinations explicitly
+        private static IEnumerable<Match> GeneratePossibleMatches(IEnumerable<Team> teams, Guid seasonId)
         {
-            var matches = new List<Match>();
-            var firstMatchDate = GetFirstMatchDate(season.StartDate, season.DayOfWeek);
-            var matchDate = firstMatchDate; // Initialize match date
+            var possibleMatches = new List<Match>();
+            var teamList = teams.ToList();
+            int n = teamList.Count;
 
-            // Dictionary to track the number of matches each player has played
-            var playerMatchCount = new Dictionary<Guid, int>();
-
-            // Initialize player match count
-            foreach (var player in players)
+            // Loop through each unique pair of teams
+            for (int i = 0; i < n; i++)
             {
-                playerMatchCount[player.Id] = 0;
-            }
-
-            while (matches.Count < season.AmountOfMatches)
-            {
-                // Take two random teams from the list
-                var team1 = await TakeRandomTeamFromListWithoutRepetition(teams, playerMatchCount);
-                var team2 = await TakeRandomTeamFromListWithoutRepetition(teams, playerMatchCount);
-
-                // Check if the two teams are not the same
-                if (team1 == team2)
-                    continue;
-
-                // Check if the two teams have at least 1 player in common
-                if (!HaveCommonPlayer(team1, team2))
-                    continue;
-
-                // Check if the teams are balanced based on player sex
-                if (!AreTeamsBalancedBySex(team1, team2))
-                    continue;
-
-                // Check if any player from either team has played in the last match
-                if (HasConsecutivePlayerParticipation(matches, team1, team2))
-                    continue;
-
-                // Create the match
-                var match = new Match
+                for (int j = i + 1; j < n; j++)
                 {
-                    Id = Guid.NewGuid(),
-                    Team1Id = team1.Id,
-                    Team2Id = team2.Id,
-                    MatchDate = matchDate,
-                    SeasonId = season.Id,
-                    Teams = new List<Team> { team1, team2 }
-                };
+                    var team1 = teamList[i];
+                    var team2 = teamList[j];
 
-                // Update player participation counts
-                foreach (var player in team1.Players)
-                {
-                    playerMatchCount[player.Id]++;
+                    // Create the match if participants are unique
+                    var match = new Match(team1, team2)
+                    {
+                        Id = Guid.NewGuid(),
+                        SeasonId = seasonId
+                    };
+
+                    possibleMatches.Add(match);
+
                 }
-                foreach (var player in team2.Players)
-                {
-                    playerMatchCount[player.Id]++;
-                }
-
-                // Add the match to the list
-                matches.Add(match);
-
-                // Optionally increment match date for the next match (weekly increment in this case)
-                matchDate = matchDate.AddDays(7);
             }
 
-            Console.WriteLine($"Generated {matches.Count} matches for season {season.Id} and each player has played {playerMatchCount.Count.ToString()} matches");
-
-            return matches;
+            return possibleMatches;
         }
-
-        public static Task<Team> TakeRandomTeamFromList(List<Team> teams)
-        {
-            var random = new Random();
-            var team = teams[random.Next(teams.Count)];
-
-            return Task.FromResult(team);
-        }
-
-
-        private static Task<Team> TakeRandomTeamFromListWithoutRepetition(List<Team> teams, Dictionary<Guid, int> playerMatchCount)
-        {
-            var random = new Random();
-
-            // Check for teams with players who have not played yet
-            var teamsWithUnplayedPlayers = teams
-                .Where(team => team.Players.Any(player => playerMatchCount[player.Id] == 0))
-                .ToList();
-
-            Team selectedTeam;
-
-            if (teamsWithUnplayedPlayers.Any())
-            {
-                // Select a random team that has at least one player who hasn't played yet
-                selectedTeam = teamsWithUnplayedPlayers[random.Next(teamsWithUnplayedPlayers.Count)];
-            }
-            else
-            {
-                // No unplayed players, so we need to check for the least amount of matches played
-                var leastPlayedTeams = teams
-                    .OrderBy(t => t.Players.Min(p => playerMatchCount[p.Id])) // Get the minimum match count for players in each team
-                    .ToList();
-
-                // Find the minimum matches played across all teams
-                int minMatchesPlayed = leastPlayedTeams.Min(t => t.Players.Min(p => playerMatchCount[p.Id]));
-
-                // Filter teams that have the minimum matches played
-                var teamsWithLeastMatches = leastPlayedTeams
-                    .Where(t => t.Players.Min(p => playerMatchCount[p.Id]) == minMatchesPlayed)
-                    .ToList();
-
-                // Select a random team among those with the least matches played
-                selectedTeam = teamsWithLeastMatches[random.Next(teamsWithLeastMatches.Count)];
-            }
-
-            return Task.FromResult(selectedTeam);
-        }
-
-
-        private static bool AreTeamsBalancedBySex(Team team1, Team team2)
-        {
-            // Count the number of male and female players in both teams
-            int maleCountTeam1 = team1.Players.Count(m => m.Sex == "M");
-            int femaleCountTeam1 = team1.Players.Count(m => m.Sex == "F");
-
-            int maleCountTeam2 = team2.Players.Count(m => m.Sex == "M");
-            int femaleCountTeam2 = team2.Players.Count(m => m.Sex == "F");
-
-            // Check for balanced matches
-            bool isMM = maleCountTeam1 == 2 && maleCountTeam2 == 2; // MM vs MM
-            bool isFF = femaleCountTeam1 == 2 && femaleCountTeam2 == 2; // FF vs FF
-            bool isMF = maleCountTeam1 == 1 && femaleCountTeam1 == 1 && maleCountTeam2 == 1 && femaleCountTeam2 == 1; // MF vs MF
-
-            return isMM || isFF || isMF;
-        }
-
-        // Function to check if two teams have at least one player in common
-        private static bool HaveCommonPlayer(Team team1, Team team2)
-        {
-            return team1.Players.Intersect(team2.Players).Any();
-        }
-
-
-        // Function to check if any player from either team has played in the last match
-        private bool HasConsecutivePlayerParticipation(List<Match> matches, Team team1, Team team2)
-        {
-            // Check if there are any matches already created
-            if (matches.Count == 0)
-                return false;
-
-            // Get the last match
-            var lastMatch = matches.Last();
-
-            // Check if players from team1 or team2 participated in the last match
-            bool team1PlayedLastMatch = lastMatch.Team1Id == team1.Id || lastMatch.Team2Id == team1.Id;
-            bool team2PlayedLastMatch = lastMatch.Team1Id == team2.Id || lastMatch.Team2Id == team2.Id;
-
-            // If either team played in the last match, check player participation
-            if (team1PlayedLastMatch || team2PlayedLastMatch)
-            {
-                var playersInLastMatch = new HashSet<Player>(
-                    (lastMatch.Team1Id == team1.Id ? team1.Players : team2.Players)
-                    .Concat(lastMatch.Team1Id == team2.Id ? team2.Players : team1.Players)
-                );
-
-                // Check if any of the players from the current teams are in the last match
-                return playersInLastMatch.Intersect(team1.Players).Any() || playersInLastMatch.Intersect(team2.Players).Any();
-            }
-
-            return false; // No players played consecutively
-        }
-
-
-
-
-
-
-
 
     }
+
+
+
 }
+
+

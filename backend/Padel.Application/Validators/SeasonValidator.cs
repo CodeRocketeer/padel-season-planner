@@ -1,39 +1,47 @@
 ﻿using FluentValidation;
-using Padel.Application.Repositories;
-using Padel.Domain.Models;
+using Padel.Application.Models;
+using Padel.Application.Repositories.Interfaces;
 
-namespace Padel.Application.Validators
+namespace Padel.Application.Validators.SeasonValidator;
+
+public class SeasonValidator : AbstractValidator<Season>
 {
-    public class SeasonValidator : AbstractValidator<Season>
+    private readonly ISeasonRepository _seasonRepository;
+
+    public SeasonValidator(ISeasonRepository seasonRepository)
     {
-        private readonly ISeasonRepository _seasonRepository;
+        _seasonRepository = seasonRepository;
+
+        RuleFor(x => x.Id)
+            .NotEmpty();
+
+        RuleFor(x => x.Title)
+                .NotEmpty();
+
+        RuleFor(x => x.AmountOfMatches)
+            .NotEmpty()
+            .GreaterThan(0);
 
 
-        public SeasonValidator(ISeasonRepository seasonRepository)
+        RuleFor(x => x.StartDate)
+            .NotEmpty()
+            .GreaterThan(DateTime.UtcNow);
+
+        RuleFor(x => x.DayOfWeek)
+            .NotEmpty()
+            .GreaterThan(0)
+            .LessThan(6);
+    }
+
+    private async Task<bool> ValidateSlug(Season Season, string slug, CancellationToken token = default)
+    {
+        var existingSeason = await _seasonRepository.GetBySlugAsync(slug);
+
+        if (existingSeason is not null)
         {
-            _seasonRepository = seasonRepository;
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .MaximumLength(50)
-                .MinimumLength(3)
-                .WithMessage("Name is not valid");
-
-            RuleFor(x => x.StartDate)
-                .NotEmpty()
-                .GreaterThanOrEqualTo(DateTime.Now)
-                .WithMessage("Start date is not valid");
-
-            RuleFor(x => x.AmountOfMatches)
-                .NotEmpty()
-                .GreaterThanOrEqualTo(1)
-                .WithMessage("Amount of matches is not valid");
-
-            RuleFor(x => x.DayOfWeek)
-                .NotEmpty()
-                .GreaterThanOrEqualTo(0)
-                .LessThanOrEqualTo(6)
-                .WithMessage("Day of week is not valid");
-
+            return existingSeason.Id == Season.Id;
         }
+
+        return existingSeason is null;
     }
 }

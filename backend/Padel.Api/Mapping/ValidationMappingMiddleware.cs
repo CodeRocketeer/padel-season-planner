@@ -1,40 +1,36 @@
 ﻿using FluentValidation;
 using Padel.Contracts.Responses;
 
+namespace Padel.Api.Mapping;
 
-namespace Padel.Api.Mapping
+public class ValidationMappingMiddleware
 {
-    public class ValidationMappingMiddleware
+    private readonly RequestDelegate _next;
+
+    public ValidationMappingMiddleware(RequestDelegate next)
     {
+        _next = next;
+    }
 
-        private readonly RequestDelegate _next;
-
-        public ValidationMappingMiddleware(RequestDelegate next)
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
         {
-            _next = next;
+            await _next(context);
         }
-
-        public async Task InvokeAsync(HttpContext context)
+        catch (ValidationException ex)
         {
-            try
+            context.Response.StatusCode = 400;
+            var validationFailureResponse = new ValidationFailureResponse
             {
-                await _next(context);
-            }
-            catch (ValidationException ex) 
-            {
-                context.Response.StatusCode = 400;
-
-                var validationFailureResponse = new ValidationFailureResponse
+                Errors = ex.Errors.Select(x => new ValidationResponse
                 {
-                    Errors = ex.Errors.Select(e => new ValidationResponse
-                    {
-                        Message = e.ErrorMessage,
-                        PropertyName = e.PropertyName
-                    })
-                };
+                    PropertyName = x.PropertyName,
+                    Message = x.ErrorMessage
+                })
+            };
 
-                await context.Response.WriteAsJsonAsync(validationFailureResponse);
-            }
+            await context.Response.WriteAsJsonAsync(validationFailureResponse);
         }
     }
 }

@@ -1,33 +1,16 @@
-﻿using Padel.Contracts.Responses.Match;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PadelContracts.Responses.Match;
 
-namespace Padel.Contracts.Responses.Season
+namespace Padel.Contracts.Responses.Season;
+
+public class SeasonResponse
 {
-    public class SeasonResponse
-    {
+    public required Guid Id { get; init; }
+    public int AmountOfMatches { get; init; }
+    public DateTime StartDate { get; init; }
 
-        public Guid Id { get; init; }
+    public bool? UserParticipates { get; init; }
+    public string? Title { get; init; }
+    public int DayOfWeek { get; init; }
 
-        public required int DayOfWeek { get; init; }
-
-        public required int AmountOfMatches { get; init; }
-
-        public required DateTime StartDate { get; init; }
-
-        public DateTime EndDate { get; set; }
-
-        public required string? Name { get; init; }
-
-        public List<MatchResponse>? Matches { get; set; }
-
-        
-
-
-
-
-    }
+    public List<SimplifiedMatchResponse>? Matches { get; init; } // Nullable list of matches
 }
