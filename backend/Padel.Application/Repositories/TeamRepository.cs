@@ -23,8 +23,8 @@ namespace Padel.Application.Repositories
             {
                 Id = team.Id,
                 SeasonId = team.SeasonId,
-                Participant1Id = team.Participant1?.Id ?? Guid.Empty, // Handle null case
-                Participant2Id = team.Participant2?.Id ?? Guid.Empty  // Handle null case
+                Participant1Id = team.Player1?.Id ?? Guid.Empty, // Handle null case
+                Participant2Id = team.Player2?.Id ?? Guid.Empty  // Handle null case
             }).ToList();
 
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);

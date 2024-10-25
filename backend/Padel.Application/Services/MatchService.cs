@@ -14,7 +14,7 @@ namespace Padel.Application.Services
             _ruleSet = ruleSet;
         }
 
-        public async Task<IEnumerable<Match>> CreateBalancedMatchesForSeasonAsync(IEnumerable<Team> teams, Season season, IEnumerable<Participant> participants, CancellationToken token)
+        public async Task<IEnumerable<Match>> CreateBalancedMatchesForSeasonAsync(IEnumerable<Team> teams, Season season, IEnumerable<Player> participants, CancellationToken token)
         {
             var scheduledMatchSets = new List<(List<Match> Matches, decimal FaultPercentage)>();
 
@@ -50,7 +50,7 @@ namespace Padel.Application.Services
             return Enumerable.Empty<Match>();
         }
 
-        private (List<Match> scheduledMatches, decimal averageFaultPercentage) CreateMatchesForSeasonIteration(IEnumerable<Team> teams, Season season, IEnumerable<Participant> participants, List<Match> shuffledMatches, CancellationToken token)
+        private (List<Match> scheduledMatches, decimal averageFaultPercentage) CreateMatchesForSeasonIteration(IEnumerable<Team> teams, Season season, IEnumerable<Player> participants, List<Match> shuffledMatches, CancellationToken token)
         {
             var scheduledMatches = new List<Match>();
             var faultyMatches = new List<(Match match, decimal faultPercentage)>();
@@ -106,7 +106,7 @@ namespace Padel.Application.Services
         }
 
 
-        private List<Match> AddPerfectMatches(IEnumerable<Match> shuffledMatches, List<Match> scheduledMatches, List<(Match match, decimal faultPercentage)> faultyMatches, Season season, List<Participant> participants, CancellationToken token)
+        private List<Match> AddPerfectMatches(IEnumerable<Match> shuffledMatches, List<Match> scheduledMatches, List<(Match match, decimal faultPercentage)> faultyMatches, Season season, List<Player> participants, CancellationToken token)
         {
 
 

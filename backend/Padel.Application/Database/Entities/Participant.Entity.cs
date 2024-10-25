@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Padel.Application.Database.Entities
 {
-    public class Participant
+    public class Player
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

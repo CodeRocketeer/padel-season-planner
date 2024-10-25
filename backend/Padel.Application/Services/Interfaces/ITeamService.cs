@@ -9,6 +9,6 @@ namespace Padel.Application.Services.Interfaces
 {
     public interface ITeamService
     {
-        Task<IEnumerable<Team>> CreateTeamCombinationsForSeasonAsync(Guid seasonId, IEnumerable<Participant> participants, CancellationToken token = default);
+        Task<IEnumerable<Team>> CreateTeamCombinationsForSeasonAsync(Guid seasonId, IEnumerable<Player> participants, CancellationToken token = default);
     }
 }

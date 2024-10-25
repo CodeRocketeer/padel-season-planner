@@ -12,7 +12,7 @@ namespace Padel.Application.Rules
             Rules = new List<IRule>(rules);
         }
 
-        public decimal Validate(Match match, List<Match> scheduledMatches, List<Participant> participants)
+        public decimal Validate(Match match, List<Match> scheduledMatches, List<Player> participants)
         {
             decimal totalFaultPercentage = 0;
 

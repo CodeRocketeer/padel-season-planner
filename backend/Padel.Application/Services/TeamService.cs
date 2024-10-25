@@ -14,7 +14,7 @@ public class TeamService : ITeamService
         _teamValidator = teamValidator;
     }
 
-    public async Task<IEnumerable<Team>> CreateTeamCombinationsForSeasonAsync(Guid seasonId, IEnumerable<Participant> participants, CancellationToken token = default)
+    public async Task<IEnumerable<Team>> CreateTeamCombinationsForSeasonAsync(Guid seasonId, IEnumerable<Player> participants, CancellationToken token = default)
     {
         var teams = new List<Team>();
         var playerList = participants.ToList();

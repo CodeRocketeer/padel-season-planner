@@ -11,7 +11,7 @@ namespace Padel.Application.Rules
     {
         public int Weight => 90;
 
-        public decimal Validate(Match match, List<Match> scheduledMatches, List<Participant> participants)
+        public decimal Validate(Match match, List<Match> scheduledMatches, List<Player> participants)
         {
             var team1Participants = match.Team1.GetParticipants();
             var team2Participants = match.Team2.GetParticipants();

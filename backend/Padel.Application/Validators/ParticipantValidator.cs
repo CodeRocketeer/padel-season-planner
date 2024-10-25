@@ -3,7 +3,7 @@ using Padel.Application.Models;
 
 namespace Padel.Application.Validators.ParticipantValidator;
 
-public class ParticipantValidator : AbstractValidator<Participant>
+public class ParticipantValidator : AbstractValidator<Player>
 {
 
 

@@ -17,11 +17,11 @@ namespace Padel.Tests
         public void Validate_Returns100_WhenParticipantsAreOnBothTeams()
         {
             // Arrange
-            var participant1 = new Participant { Id = Guid.NewGuid() };
-            var participant2 = new Participant { Id = Guid.NewGuid() };
-            var sameParticipant = new Participant { Id = Guid.NewGuid() };
+            var participant1 = new Player { Id = Guid.NewGuid() };
+            var participant2 = new Player { Id = Guid.NewGuid() };
+            var sameParticipant = new Player { Id = Guid.NewGuid() };
 
-            // Create two teams that share the same participant
+            // Create two teams that share the same player
             var team1 = new Team(participant1, sameParticipant);
             var team2 = new Team(participant2, sameParticipant);
 
@@ -32,22 +32,22 @@ namespace Padel.Tests
             var rule = new CommonPlayerRule();
 
             // Act
-            var result = rule.Validate(match, new List<Match>(), new List<Participant>());
+            var result = rule.Validate(match, new List<Match>(), new List<Player>());
 
             // Assert
-            Assert.Equal(100, result);  // Expecting a 100% fault as the same participant is on both teams
+            Assert.Equal(100, result);  // Expecting a 100% fault as the same player is on both teams
         }
 
         [Fact]
         public void Validate_Returns0_WhenNoParticipantsAreOnBothTeams()
         {
             // Arrange
-            var participant1 = new Participant { Id = Guid.NewGuid() };
-            var participant2 = new Participant { Id = Guid.NewGuid() };
-            var participant3 = new Participant { Id = Guid.NewGuid() };
-            var participant4 = new Participant { Id = Guid.NewGuid() };
+            var participant1 = new Player { Id = Guid.NewGuid() };
+            var participant2 = new Player { Id = Guid.NewGuid() };
+            var participant3 = new Player { Id = Guid.NewGuid() };
+            var participant4 = new Player { Id = Guid.NewGuid() };
 
-            // Create two teams that share the same participant
+            // Create two teams that share the same player
             var team1 = new Team(participant1, participant2);
             var team2 = new Team(participant3, participant4);
 
@@ -58,7 +58,7 @@ namespace Padel.Tests
             var rule = new CommonPlayerRule();
 
             // Act
-            var result = rule.Validate(match, new List<Match>(), new List<Participant>());
+            var result = rule.Validate(match, new List<Match>(), new List<Player>());
 
             // Assert
             Assert.Equal(0, result);  // Expecting a 0% fault as no participants are on both teams

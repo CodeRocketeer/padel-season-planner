@@ -23,7 +23,7 @@ namespace Padel.Tests
             var rule = new UniqueTeamRule();
 
             // Act
-            var result = rule.Validate(match, new List<Match>(), new List<Participant>());
+            var result = rule.Validate(match, new List<Match>(), new List<Player>());
 
             Assert.Equal(0, result);
         }
@@ -43,7 +43,7 @@ namespace Padel.Tests
             var rule = new UniqueTeamRule();
 
             // Act
-            var result = rule.Validate(match, new List<Match>(), new List<Participant>());
+            var result = rule.Validate(match, new List<Match>(), new List<Player>());
 
             Assert.Equal(100, result);
         }

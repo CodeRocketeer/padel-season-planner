@@ -14,7 +14,7 @@ namespace Padel.Tests
         {
             // Arrange
             var teams = Enumerable.Range(1, 4)
-                 .Select((i, index) => new { Participant = new Participant { Id = Guid.NewGuid(), Name = $"Player {i}" }, Index = index })
+                 .Select((i, index) => new { Participant = new Player { Id = Guid.NewGuid(), Name = $"Player {i}" }, Index = index })
                  .GroupBy(x => x.Index / 2)
                  .Select(g => new Team(g.First().Participant, g.Last().Participant))
                  .ToArray();
@@ -33,7 +33,7 @@ namespace Padel.Tests
             var rule = new ConsecutiveParticipantsRule();
 
             // Act
-            var result = rule.Validate(currentMatch, new List<Match> { lastMatch }, new List<Participant>());
+            var result = rule.Validate(currentMatch, new List<Match> { lastMatch }, new List<Player>());
 
             // Assert
             Assert.Equal(100, result); // Expecting a 100% fault due to consecutive matches
@@ -44,7 +44,7 @@ namespace Padel.Tests
         {
             // Arrange
             var teams = Enumerable.Range(1, 8)
-                .Select((i, index) => new { Participant = new Participant { Id = Guid.NewGuid(), Name = $"Player {i}" }, Index = index })
+                .Select((i, index) => new { Participant = new Player { Id = Guid.NewGuid(), Name = $"Player {i}" }, Index = index })
                 .GroupBy(x => x.Index / 2)
                 .Select(g => new Team(g.First().Participant, g.Last().Participant))
                 .ToArray();
@@ -63,7 +63,7 @@ namespace Padel.Tests
             var rule = new ConsecutiveParticipantsRule();
 
             // Act
-            var result = rule.Validate(currentMatch, new List<Match> { lastMatch }, new List<Participant>());
+            var result = rule.Validate(currentMatch, new List<Match> { lastMatch }, new List<Player>());
 
             // Assert
             Assert.Equal(0, result); // Expecting a 100% fault due to consecutive matches

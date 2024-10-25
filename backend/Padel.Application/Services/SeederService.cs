@@ -25,18 +25,18 @@ public class SeederService : ISeederService
         if (!seasonExists)
             throw new DirectoryNotFoundException(message: $"Season with ID '{seasonId}' does not exist.");
         // Create participants
-        var participants = new List<Participant>();
+        var participants = new List<Player>();
       
 
         for (int i = 0; i < count; i++)
         {
-            participants.Add(new Participant
+            participants.Add(new Player
             {
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 Gender = i % 2 == 0 ? "M" : "F",
                 SeasonId = seasonId,
-                Name = $"Participant {i + 1}"
+                Name = $"Player {i + 1}"
             });
 
         }

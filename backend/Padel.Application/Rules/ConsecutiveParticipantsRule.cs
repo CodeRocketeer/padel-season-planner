@@ -11,7 +11,7 @@ namespace Padel.Application.Rules
     {
         public int Weight => 80; // Importance of this rule
 
-        public decimal Validate(Match match, List<Match> scheduledMatches, List<Participant> participants)
+        public decimal Validate(Match match, List<Match> scheduledMatches, List<Player> participants)
         {
             // Get last match from the planned matches
             var lastMatch = scheduledMatches

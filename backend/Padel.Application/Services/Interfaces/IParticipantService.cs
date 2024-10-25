@@ -9,11 +9,11 @@ namespace Padel.Application.Services.Interfaces
 {
     public interface IParticipantService
     {
-        Task<bool> ParticipateInSeasonAsync(Participant participant, CancellationToken token = default);
+        Task<bool> ParticipateInSeasonAsync(Player player, CancellationToken token = default);
 
         Task<bool> LeaveSeasonAsync(Guid seasonId, Guid userId, CancellationToken token = default);
 
-        Task<IEnumerable<Participant>> GetAllAsync(GetAllParticipantsOptions options, CancellationToken token = default);
+        Task<IEnumerable<Player>> GetAllAsync(GetAllParticipantsOptions options, CancellationToken token = default);
 
 
     }

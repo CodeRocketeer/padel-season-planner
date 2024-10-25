@@ -15,7 +15,7 @@ public class ParticipantRepository : IParticipantRepository
         _dbConnectionFactory = dbConnectionFactory;
     }
 
-    public async Task<bool> ParticipateInSeasonAsync(Participant participant, CancellationToken token = default)
+    public async Task<bool> ParticipateInSeasonAsync(Player player, CancellationToken token = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
         using var transaction = connection.BeginTransaction();
@@ -23,7 +23,7 @@ public class ParticipantRepository : IParticipantRepository
         var result = await connection.ExecuteAsync(new CommandDefinition("""
             insert into Participants (id, userId, seasonId, gender, name) 
             values (@Id, @UserId, @SeasonId, @Gender, @Name)
-            """, participant, cancellationToken: token));
+            """, player, cancellationToken: token));
 
 
         transaction.Commit();
@@ -53,10 +53,10 @@ public class ParticipantRepository : IParticipantRepository
         return result > 0;
     }
 
-    public async Task<IEnumerable<Participant>> GetAllAsync(GetAllParticipantsOptions options, CancellationToken token = default)
+    public async Task<IEnumerable<Player>> GetAllAsync(GetAllParticipantsOptions options, CancellationToken token = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
-        var result = await connection.QueryAsync<Participant>(new CommandDefinition("""
+        var result = await connection.QueryAsync<Player>(new CommandDefinition("""
             select * from Participants where (@seasonId is null or seasonId = @seasonId) and (@userId is null or userId = @userId)
             """, new
         {
@@ -64,7 +64,7 @@ public class ParticipantRepository : IParticipantRepository
             userId = options.UserId
         }, cancellationToken: token));
 
-        return result.Select(x => new Participant
+        return result.Select(x => new Player
         {
             Id = x.Id,
             UserId = x.UserId,
@@ -77,7 +77,7 @@ public class ParticipantRepository : IParticipantRepository
     }
 
 
-     public async Task<bool> CreateManyAsync(List<Participant> participants, CancellationToken token = default)
+     public async Task<bool> CreateManyAsync(List<Player> participants, CancellationToken token = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
         using var transaction = connection.BeginTransaction();

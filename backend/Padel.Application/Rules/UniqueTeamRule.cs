@@ -11,7 +11,7 @@ namespace Padel.Application.Rules
     {
         public int Weight => 50; // Importance of this rule
 
-        public decimal Validate(Match match , List<Match> scheduledMatches, List<Participant> participants)
+        public decimal Validate(Match match , List<Match> scheduledMatches, List<Player> participants)
         {
             // Check if the team IDs are the same
             if (match.Team1.Id == match.Team2.Id)

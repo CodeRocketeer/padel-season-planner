@@ -60,9 +60,9 @@ public static class ContractMapping
     }
 
 
-    public static Participant MapToParticipant(this CreateParticipantRequest request, Guid? userId, Guid seasonId)
+    public static Player MapToParticipant(this CreateParticipantRequest request, Guid? userId, Guid seasonId)
     {
-        return new Participant
+        return new Player
         {
             Id = Guid.NewGuid(),
             UserId = userId!.Value,
@@ -73,7 +73,7 @@ public static class ContractMapping
 
     }
 
-    public static ParticipantsResponse MapToResponse(this IEnumerable<Participant> participants)
+    public static ParticipantsResponse MapToResponse(this IEnumerable<Player> participants)
     {
         return new ParticipantsResponse
         {
@@ -81,15 +81,15 @@ public static class ContractMapping
         };
     }
 
-    public static ParticipantResponse MapToResponse(this Participant participant)
+    public static ParticipantResponse MapToResponse(this Player player)
     {
         return new ParticipantResponse
         {
-            Id = participant.Id,
-            Name = participant.Name,
-            Gender = participant.Gender,
-            UserId = participant.UserId,
-            SeasonId = participant.SeasonId
+            Id = player.Id,
+            Name = player.Name,
+            Gender = player.Gender,
+            UserId = player.UserId,
+            SeasonId = player.SeasonId
 
         };
     }
@@ -132,8 +132,8 @@ public static class ContractMapping
         {
             Id = team.Id,
             SeasonId = team.SeasonId,
-            Participant1 = team.Participant1?.MapToResponse(),
-            Participant2 = team.Participant2?.MapToResponse()
+            Participant1 = team.Player1?.MapToResponse(),
+            Participant2 = team.Player2?.MapToResponse()
         };
     }
 

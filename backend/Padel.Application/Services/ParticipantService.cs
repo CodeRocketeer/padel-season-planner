@@ -9,11 +9,11 @@ namespace Padel.Application.Services
     public class ParticipantService : IParticipantService
     {
         private readonly IParticipantRepository _participantRepository;
-        private readonly IValidator<Participant> _participantValidator;
+        private readonly IValidator<Player> _participantValidator;
         private readonly IValidator<GetAllParticipantsOptions> _optionsValidator;
         private readonly ISeasonRepository _seasonRepository;
 
-        public ParticipantService(IParticipantRepository participantRepository, IValidator<Participant> participantValidator, ISeasonRepository seasonRepository, IValidator<GetAllParticipantsOptions> optionsValidator)
+        public ParticipantService(IParticipantRepository participantRepository, IValidator<Player> participantValidator, ISeasonRepository seasonRepository, IValidator<GetAllParticipantsOptions> optionsValidator)
         {
             _participantRepository = participantRepository;
             _participantValidator = participantValidator;
@@ -22,17 +22,17 @@ namespace Padel.Application.Services
 
         }
 
-        public async Task<bool> ParticipateInSeasonAsync(Participant participant, CancellationToken token)
+        public async Task<bool> ParticipateInSeasonAsync(Player player, CancellationToken token)
         {
-            await _participantValidator.ValidateAndThrowAsync(participant, cancellationToken: token);
-            var seasonExists = await _seasonRepository.ExistsByIdAsync(participant.SeasonId, token);
+            await _participantValidator.ValidateAndThrowAsync(player, cancellationToken: token);
+            var seasonExists = await _seasonRepository.ExistsByIdAsync(player.SeasonId, token);
             if (!seasonExists)
-                throw new DirectoryNotFoundException(message: $"Season with ID '{participant.SeasonId}' does not exist.");
-            var ParticipantExists = await _participantRepository.ExistsBySeasonAndUserIdAsync(participant.SeasonId, participant.UserId, token);
+                throw new DirectoryNotFoundException(message: $"Season with ID '{player.SeasonId}' does not exist.");
+            var ParticipantExists = await _participantRepository.ExistsBySeasonAndUserIdAsync(player.SeasonId, player.UserId, token);
             if (ParticipantExists)
-                throw new DirectoryNotFoundException(message: $"User with ID '{participant.UserId}' is already a participant in the season with ID '{participant.SeasonId}'.");
+                throw new DirectoryNotFoundException(message: $"User with ID '{player.UserId}' is already a player in the season with ID '{player.SeasonId}'.");
 
-            return await _participantRepository.ParticipateInSeasonAsync(participant, token);
+            return await _participantRepository.ParticipateInSeasonAsync(player, token);
         }
 
         public async Task<bool> LeaveSeasonAsync(Guid seasonId, Guid userId, CancellationToken token = default)
@@ -47,7 +47,7 @@ namespace Padel.Application.Services
 
         }
 
-        public async Task<IEnumerable<Participant>> GetAllAsync(GetAllParticipantsOptions options, CancellationToken token = default)
+        public async Task<IEnumerable<Player>> GetAllAsync(GetAllParticipantsOptions options, CancellationToken token = default)
         {
 
             await _optionsValidator.ValidateAndThrowAsync(options, token);

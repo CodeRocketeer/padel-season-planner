@@ -9,6 +9,9 @@ namespace Padel.Application.Services.Interfaces
 {
     public interface IMatchService
     {
-        Task<IEnumerable<Match>> CreateBalancedMatchesForSeasonAsync(IEnumerable<Team> teams, Season season, IEnumerable<Participant> participants, CancellationToken token);
+        Task<IEnumerable<Match>> CreateBalancedMatchesForSeasonAsync(IEnumerable<Team> teams, Season season, IEnumerable<Player> participants, CancellationToken token);
+
+        void GetMatches();
+
     }
 }
