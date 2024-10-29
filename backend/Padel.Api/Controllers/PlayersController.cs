@@ -8,6 +8,7 @@ using PadelContracts.Requests.Player;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Padel.Domain.Models;
 
 namespace Padel.Api.Controllers
 {

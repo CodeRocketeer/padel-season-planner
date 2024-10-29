@@ -1,7 +1,6 @@
 
 using Padel.Application.Models;
 using Padel.Application.Rules;
-using Match = Padel.Application.Models.Match;
 
 
 

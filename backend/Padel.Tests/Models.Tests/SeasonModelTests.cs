@@ -3,6 +3,8 @@ using Padel.Application.Database.Entities;
 using Padel.Application.Models;
 using System;
 using System.Collections.Generic;
+using Padel.Application.Mappers;
+using Padel.Domain.Models;
 using Xunit;
 
 namespace Padel.Tests.Models
@@ -76,7 +78,7 @@ namespace Padel.Tests.Models
             var season = new Season(amountOfMatches, startDate, title, dayOfWeek) { Id = 1 };
 
             // Act
-            var seasonEntity = Season.ToEntity(season);
+            var seasonEntity = season.ToEntity();
 
             // Assert
             seasonEntity.Id.Should().Be(season.Id);
@@ -100,7 +102,7 @@ namespace Padel.Tests.Models
             };
 
             // Act
-            var season = Season.FromEntity(seasonEntity);
+            var season = seasonEntity.FromEntity();
 
             // Assert
             season.Id.Should().Be(seasonEntity.Id);
@@ -117,7 +119,7 @@ namespace Padel.Tests.Models
             var season = new Season(5, DateTime.UtcNow.AddDays(1), "Spring League", DayOfWeek.Friday);
 
             // Act
-            var seasonEntity = Season.ToEntity(season);
+            var seasonEntity = season.ToEntity();
 
             // Assert
             seasonEntity.Id.Should().Be(0); // Ensures EF Core will assign an Id on save

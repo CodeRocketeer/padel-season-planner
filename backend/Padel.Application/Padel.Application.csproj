@@ -20,4 +20,8 @@
       <Folder Include="Validators\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Padel.Domain\Padel.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

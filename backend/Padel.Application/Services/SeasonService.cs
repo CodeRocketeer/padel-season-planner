@@ -4,6 +4,8 @@ using Padel.Application.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Padel.Application.Mappers;
+using Padel.Domain.Models;
 
 namespace Padel.Application.Services
 {
@@ -19,10 +21,10 @@ namespace Padel.Application.Services
         public async Task<Season> CreateAsync(Season season, CancellationToken token)
         {
             // Convert Season model to SeasonEntity using the static method
-            var seasonEntity = Season.ToEntity(season);
+            var seasonEntity = season.ToEntity();
             // Add to repository and return the created entity's ID
             var result = await _seasonRepository.AddAsync(seasonEntity, token);
-            return Season.FromEntity(result); // Assuming AddAsync returns SeasonEntity
+            return result.FromEntity(); // Assuming AddAsync returns SeasonEntity
         }
 
 
@@ -37,7 +39,7 @@ namespace Padel.Application.Services
             // Get all seasons from the repository
             var seasonEntities = await _seasonRepository.GetAllAsync(token);
             // Convert each SeasonEntity to Season model
-            var seasons = seasonEntities.Select(seasonEntity => Season.FromEntity(seasonEntity));
+            var seasons = seasonEntities.Select(seasonEntity => seasonEntity.FromEntity());
             return seasons;
         }
 
@@ -46,17 +48,17 @@ namespace Padel.Application.Services
             // Get the season entity from the repository
             var seasonEntity = await _seasonRepository.GetByIdAsync(id, token);
             // Convert to Season model if found
-            return seasonEntity != null ? Season.FromEntity(seasonEntity) : null;
+            return seasonEntity != null ? seasonEntity.FromEntity() : null;
         }
 
         public async Task<Season> UpdateAsync(Season season, CancellationToken token)
         {
             // Convert Season model to SeasonEntity using the static method
-            var seasonEntity = Season.ToEntity(season);
+            var seasonEntity = season.ToEntity();
             // Update the season in the repository
             var updatedEntity = await _seasonRepository.UpdateAsync(seasonEntity, token);
             // Return the updated Season model
-            return Season.FromEntity(updatedEntity);
+            return updatedEntity.FromEntity();
         }
 
         public async Task<bool> JoinSeasonAsync(int seasonId, Guid userId, CancellationToken token)

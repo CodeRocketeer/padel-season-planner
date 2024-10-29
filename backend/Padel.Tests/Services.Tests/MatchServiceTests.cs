@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Padel.Application.Models;
 using Padel.Application.Services;
+using Padel.Domain.Models;
 
 namespace Padel.Tests.Services.Tests
 {

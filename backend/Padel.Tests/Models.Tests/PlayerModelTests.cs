@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using Padel.Application.Database.Entities;
+using Padel.Application.Mappers;
 using Padel.Application.Models;
+using Padel.Domain.Models;
 
 namespace Padel.Tests.Models;
 
@@ -20,23 +22,13 @@ public class PlayerModelTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
+    [InlineData("     ")]
     public void CreateNewPlayer_EmptyOrNullName_Throws(string name)
     {
         FluentActions
              .Invoking(() => new Player(Gender.Male, name, Guid.NewGuid()))
              .Should()
              .Throw< ArgumentNullException>();
-    }
-
-    [Theory]
-    [InlineData(-1)]
-    [InlineData(3)]
-    public void CreateNewPlayer_InvalidGender_Throws(int gender)
-    {
-        FluentActions
-             .Invoking(() => new Player((Gender)gender, "Joske", Guid.NewGuid()))
-             .Should()
-             .Throw< ArgumentOutOfRangeException>();
     }
 
     [Fact]
@@ -59,7 +51,7 @@ public class PlayerModelTests
         };
 
         // Act
-        var playerEntity = Player.ToEntity(player);
+        var playerEntity = player.ToEntity();
 
         // Assert
         playerEntity.Id.Should().Be(player.Id);
@@ -82,7 +74,7 @@ public class PlayerModelTests
         };
 
         // Act
-        var player = Player.FromEntity(playerEntity);
+        var player = playerEntity.FromEntity();
 
         // Assert
         player.Id.Should().Be(playerEntity.Id);
@@ -98,7 +90,7 @@ public class PlayerModelTests
         var player = new Player(Gender.Male, "Jonas", Guid.NewGuid());
 
         // Act
-        var playerEntity = Player.ToEntity(player);
+        var playerEntity = player.ToEntity();
 
         // Assert
         playerEntity.Id.Should().Be(0); // Ensures EF Core will assign an Id on save

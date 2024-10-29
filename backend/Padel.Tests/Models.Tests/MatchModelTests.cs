@@ -2,6 +2,8 @@
 using Padel.Application.Database.Entities;
 using Padel.Application.Models;
 using System;
+using Padel.Application.Mappers;
+using Padel.Domain.Models;
 using Xunit;
 
 namespace Padel.Tests.Models
@@ -113,7 +115,7 @@ namespace Padel.Tests.Models
             var match = new Match(team1, team2) { Id = 3, SeasonId = 4, MatchDate = DateTime.UtcNow.AddDays(1) };
 
             // Act
-            var matchEntity = Match.ToEntity(match);
+            var matchEntity = match.ToEntity();
 
             // Assert
             matchEntity.Id.Should().Be(match.Id);
@@ -141,7 +143,7 @@ namespace Padel.Tests.Models
             };
 
             // Act
-            var match = Match.FromEntity(matchEntity, team1, team2);
+            var match = matchEntity.FromEntity(team1, team2);
 
             // Assert
             match.Should().NotBeNull();

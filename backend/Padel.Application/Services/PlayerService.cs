@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Padel.Application.Mappers;
+using Padel.Domain.Models;
 
 namespace Padel.Application.Services
 {
@@ -20,10 +22,10 @@ namespace Padel.Application.Services
         public async Task<Player> AddPlayerAsync(Player player, CancellationToken token)
         {
             // Convert Player model to PlayerEntity
-            var playerEntity = Player.ToEntity(player);
+            var playerEntity = player.ToEntity();
             // Add to repository and return the created entity
             var createdEntity = await _playerRepository.AddAsync(playerEntity, token);
-            return Player.FromEntity(createdEntity); // Assuming AddAsync returns PlayerEntity
+            return createdEntity.FromEntity(); // Assuming AddAsync returns PlayerEntity
         }
 
         public async Task<bool> DeletePlayerAsync(int id, CancellationToken token)
@@ -37,7 +39,7 @@ namespace Padel.Application.Services
             // Get all players from the repository
             var playerEntities = await _playerRepository.GetAllAsync(token);
             // Convert each PlayerEntity to Player model
-            var players = playerEntities.Select(playerEntity => Player.FromEntity(playerEntity));
+            var players = playerEntities.Select(playerEntity => playerEntity.FromEntity());
             return players;
         }
 
@@ -46,17 +48,17 @@ namespace Padel.Application.Services
             // Get the player entity from the repository
             var playerEntity = await _playerRepository.GetByIdAsync(id, token);
             // Convert to Player model if found
-            return playerEntity != null ? Player.FromEntity(playerEntity) : null;
+            return playerEntity != null ? playerEntity.FromEntity() : null;
         }
 
         public async Task<Player> UpdatePlayerAsync(Player player, CancellationToken token)
         {
             // Convert Player model to PlayerEntity
-            var playerEntity = Player.ToEntity(player);
+            var playerEntity = player.ToEntity();
             // Update the player in the repository
             var updatedEntity = await _playerRepository.UpdateAsync(playerEntity, token);
             // Return the updated Player model
-            return Player.FromEntity(updatedEntity); // Assuming UpdateAsync returns PlayerEntity
+            return updatedEntity.FromEntity(); // Assuming UpdateAsync returns PlayerEntity
         }
     }
 }

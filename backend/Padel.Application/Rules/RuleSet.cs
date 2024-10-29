@@ -1,4 +1,5 @@
 ﻿using Padel.Application.Models;
+using Padel.Domain.Models;
 
 namespace Padel.Application.Rules
 {

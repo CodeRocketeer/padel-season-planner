@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using Padel.Application.Database.Entities;
+using Padel.Application.Mappers;
 using Padel.Application.Models;
+using Padel.Domain.Models;
 
 
 namespace Padel.Tests.Models;
@@ -75,7 +77,7 @@ public class TeamModelTests
         var team = new Team(player1, player2) { Id = 1, MatchId = 2 };
 
         // Act
-        var entity = Team.ToEntity(team);
+        var entity = team.ToEntity();
 
         // Assert
         entity.MatchId.Should().Be(2);
@@ -98,7 +100,7 @@ public class TeamModelTests
         };
 
         // Act
-        var team = Team.FromEntity(teamEntity);
+        var team = teamEntity.FromEntity();
 
         // Assert
         team.Id.Should().Be(1);
@@ -123,7 +125,7 @@ public class TeamModelTests
         };
 
         // Act
-        var action = () => Team.FromEntity(teamEntity);
+        var action = () => teamEntity.FromEntity();
 
         // Assert
         action.Should()

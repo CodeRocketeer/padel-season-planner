@@ -4,6 +4,7 @@ using Padel.Application.Models;
 using Padel.Contracts.Requests.Season;
 using Padel.Contracts.Responses.Participants;
 using Padel.Contracts.Responses.Season;
+using Padel.Domain.Models;
 using PadelContracts.Requests.Participant;
 using PadelContracts.Requests.Player;
 using PadelContracts.Responses.Match;
