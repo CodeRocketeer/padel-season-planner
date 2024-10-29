@@ -1,50 +1,60 @@
-﻿using Padel.Application.Models;
-using Padel.Contracts.Requests.Player;
-using Padel.Contracts.Requests.Team;
+﻿
 
-namespace Padel.Api.Mapping
+using Padel.Application.Models;
+using Padel.Contracts.Requests.Season;
+using Padel.Contracts.Responses.Participants;
+using Padel.Contracts.Responses.Season;
+using PadelContracts.Requests.Participant;
+using PadelContracts.Requests.Player;
+using PadelContracts.Responses.Match;
+using PadelContracts.Responses.Team;
+
+namespace Padel.Api.Mapping;
+
+public static class ContractMapping
 {
-    public static class ContractMapping
+    public static Season MapToSeason(this CreateSeasonRequest request)
     {
-        public static Team MapToTeam(this CreateTeamRequest request)
-        {
-            return new Team
-            {
-                Id = Guid.NewGuid(),
-                MatchId = request.MatchId,
-                Player1Id = request.Player1Id,
-                Player2Id = request.Player2Id,
-            };
-        }
+        return new Season(request.AmountOfMatches, request.StartDate, request.Title, request.DayOfWeek);
 
-        public static TeamResponse MapToResponse(this Team team)
-        {
-            return new TeamResponse
-            {
-                Id = team.Id,
-                MatchId = team.MatchId,
-                Player1Id = team.Player1Id,
-                Player2Id = team.Player2Id,
-            };
-        }
 
-        public static TeamsResponse MapToResponse(this IEnumerable<Team> teams)
-        {
-            return new TeamsResponse
-            {
-                Items = teams.Select(MapToResponse).ToList()
-            };
-        }
-
-        public static Team MapToTeam(this UpdateTeamRequest request, Guid id)
-        {
-            return new Team
-            {
-                Id = id,
-                MatchId = request.MatchId,
-                Player1Id = request.Player1Id,
-                Player2Id = request.Player2Id,
-            };
-        }
     }
+
+    public static Season MapToSeason(this UpdateSeasonRequest request, int id)
+    {
+        return new Season(request.AmountOfMatches, request.StartDate, request.Title, request.DayOfWeek)
+        {
+            Id = id
+        };
+    }
+
+    public static SeasonResponse MapToResponse(this Season season)
+    {
+        return new SeasonResponse
+        {
+            Id = season.Id,
+            AmountOfMatches = season.AmountOfMatches,
+            StartDate = season.StartDate,
+            Title = season.Title,
+            DayOfWeek = season.DayOfWeek,        
+        };
+    }
+
+    public static SeasonsResponse MapToResponse(this IEnumerable<Season> seasons)
+    {
+        return new SeasonsResponse
+        {
+            Items = seasons.Select(MapToResponse)
+        };
+    }
+
+    public static Player MapToPlayer(this CreatePlayerRequest request, Guid userId)
+    {
+        return new Player(request.Gender, request.Name, userId);
+
+    }
+
+
+
+
 }

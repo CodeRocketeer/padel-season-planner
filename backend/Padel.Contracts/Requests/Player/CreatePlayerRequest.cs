@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Padel.Application.Models;
 
-namespace Padel.Contracts.Requests.Player
+namespace PadelContracts.Requests.Player;
+
+public class CreatePlayerRequest
 {
-    public class CreatePlayerRequest
-    {
+    public Gender Gender { get; set; }
 
-        public required Guid UserId { get; set; }
+    public string Name { get; set; }
 
-        
 
-    }
 }

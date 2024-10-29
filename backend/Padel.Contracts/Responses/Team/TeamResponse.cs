@@ -1,22 +1,17 @@
-﻿using System;
+﻿using Padel.Contracts.Responses.Participants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Padel.Contracts.Requests.Player
+namespace PadelContracts.Responses.Team
 {
     public class TeamResponse
     {
-
-            public Guid Id { get; init; }
-
-            public required Guid MatchId { get; init; }
-
-            public required Guid Player1Id { get; init; }
-
-            public required Guid Player2Id { get; init; }
-
-
+        public required int Id { get; init; }              // Team ID
+        public required int SeasonId { get; init; }        // Season the team belongs to
+        public ParticipantResponse? Participant1 { get; init; } // First participant in the team
+        public ParticipantResponse? Participant2 { get; init; } // Second participant in the team
     }
 }

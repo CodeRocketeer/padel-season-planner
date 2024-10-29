@@ -1,53 +1,55 @@
-﻿using Padel.Application.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Padel.Application.Database;
+using Padel.Application.Database.Entities;
+using Padel.Application.Repositories.Interfaces;
 
-namespace Padel.Application.Repositories
+namespace Padel.Application.Repositories;
+
+
+public class TeamRepository : ITeamRepository
 {
-    public class TeamRepository : ITeamRepository
+    private readonly AppDbContext _context;
+
+    public TeamRepository(AppDbContext context)
     {
+        _context = context;
+    }
 
-        private readonly List<Team> _teams = new();
+    public async Task<TeamEntity?> GetByIdAsync(int id)
+    {
+        return await _context.Teams
+            .Include(t => t.Players) // Include players in teams
+            .FirstOrDefaultAsync(t => t.Id == id);
+    }
 
-        public Task<bool> CreateAsync(Team team)
+    public async Task<IEnumerable<TeamEntity>> GetAllAsync()
+    {
+        return await _context.Teams
+            .Include(t => t.Players)
+            .ToListAsync();
+    }
+
+    public async Task AddAsync(TeamEntity teamEntity)
+    {
+        await _context.Teams.AddAsync(teamEntity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(TeamEntity teamEntity)
+    {
+        _context.Teams.Update(teamEntity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var teamEntity = await GetByIdAsync(id);
+        if (teamEntity != null)
         {
-           _teams.Add(team);
-
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> DeleteByIdAsync(Guid id)
-        {
-            var removedCount = _teams.RemoveAll(t => t.Id == id);
-            var movieRemoved = removedCount > 0;
-            return Task.FromResult(movieRemoved);
-        }
-
-        public Task<IEnumerable<Team>> GetAllAsync()
-        {
-           return Task.FromResult(_teams.AsEnumerable());
-        }
-
-        public Task<Team?> GetByIdAsync(Guid id)
-        {
-            var team = _teams.SingleOrDefault(t => t.Id == id);
-
-            return Task.FromResult(team);
-
-        }
-
-        public Task<bool> UpdateAsync(Team team)
-        {
-            var teamIndex = _teams.FindIndex(t => t.Id == team.Id);
-            if (teamIndex == -1)
-            { 
-                return Task.FromResult(false);
-            }
-            _teams[teamIndex] = team;
-            return Task.FromResult(true);
+            _context.Teams.Remove(teamEntity);
+            await _context.SaveChangesAsync();
         }
     }
 }
+
+

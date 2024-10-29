@@ -1,19 +1,37 @@
-﻿namespace Padel.Api
+﻿namespace Padel.Api;
+
+public static class ApiEndpoints
 {
-    public static class ApiEndpoints
+    private const string ApiBase = "api";
+    
+
+    public static class Seasons
     {
-        private const string ApiBase = "api";
+        private const string Base = $"{ApiBase}/seasons";
 
-        public static class Teams
-        {
-            private const string Base = $"{ApiBase}/teams";
+        public const string Create = Base;
+        public const string Get = $"{Base}/{{id:int}}";
+        public const string GetAll = Base;
+        public const string Update = $"{Base}/{{id:int}}";
+        public const string Delete = $"{Base}/{{id:int}}";
+        public const string Confirm = $"{Base}/{{id:int}}/confirm";
 
-            public const string Create = Base;
-            public const string Get = $"{Base}/{{id:guid}}";
-            public const string GetAll = Base;
-            public const string Update = $"{Base}/{{id:guid}}";
-            public const string Delete = $"{Base}/{{id:guid}}";
-        }
-
+        // participate, using bearer token userId
+        public const string Join = $"{Base}/{{seasonId:int}}/join";
+        public const string Leave = $"{Base}/{{seasonId:guid}}/leave";
     }
+
+    public static class Players
+    {
+        private const string Base = $"{ApiBase}/players";
+        public const string Create = Base;
+        public const string Get = $"{Base}/{{id:int}}"; 
+        public const string GetAll = Base;
+        public const string Update = $"{Base}/{{id:int}}";
+        public const string Delete = $"{Base}/{{id:int}}";
+    }
+
+
+
+
 }
