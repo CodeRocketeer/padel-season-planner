@@ -1,10 +1,17 @@
-﻿using Padel.Application.Models;
+﻿using Padel.Application.Database.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Padel.Application.Repositories.Interfaces
+namespace Padel.Application.Repositories.Interfaces;
+
+public interface ITeamRepository
 {
-    public interface ITeamRepository
-    {
-
-        Task<bool> CreateManyAsync(List<Team> teams, CancellationToken token = default);
-    }
+    Task<TeamEntity?> GetByIdAsync(int id);
+    Task<IEnumerable<TeamEntity>> GetAllAsync();
+    Task AddAsync(TeamEntity teamEntity);
+    Task UpdateAsync(TeamEntity teamEntity);
+    Task DeleteAsync(int id);
 }

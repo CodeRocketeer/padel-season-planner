@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PadelContracts.Requests.Participant
 {
-    public class CreateParticipantRequest
+    public class CreateParticpantRequest
     {
         public string Gender { get; set; }
 

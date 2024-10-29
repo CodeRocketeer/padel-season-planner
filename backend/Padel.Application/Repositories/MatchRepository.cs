@@ -1,82 +1,60 @@
-﻿
-using Dapper;
+﻿using Microsoft.EntityFrameworkCore;
 using Padel.Application.Database;
 using Padel.Application.Database.Entities;
-using Padel.Application.Models;
 using Padel.Application.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Padel.Application.Repositories
+namespace Padel.Application.Repositories;
+
+public class MatchRepository : IMatchRepository
 {
-    internal class MatchRepository : IMatchRepository
+    private readonly AppDbContext _context;
+
+    public MatchRepository(AppDbContext context)
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
-        
-
-        public MatchRepository(IDbConnectionFactory dbConnectionFactory)
-        {
-            _dbConnectionFactory = dbConnectionFactory;
-            
-        }
-
-        public async Task<bool> CreateManyAsync(List<Models.Match> matches, CancellationToken token = default)
-        {
-
-            // Correct mapping to a list of entities
-            var matchEntities = matches.Select(x => new Database.Entities.Match
-            {
-                Id = x.Id,
-                SeasonId = x.SeasonId,
-                Team1Id = x.Team1.Id,
-                Team2Id = x.Team2.Id,
-                MatchDate = x.MatchDate,
-
-            });
-
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
-            using var transaction = connection.BeginTransaction();
-
-
-            foreach (var match in matchEntities)
-            {
-                var result = await connection.ExecuteAsync(new CommandDefinition("""
-                insert into Matches (Id, SeasonId, Team1Id, Team2Id, Matchdate)
-                values (@Id, @SeasonId, @Team1Id, @Team2Id, @Matchdate)
-                """, match, cancellationToken: token));
-
-                if (result <= 0)
-                {
-                    transaction.Rollback();
-                    return false;
-                }
-            }
-
-            transaction.Commit();
-
-            return true;
-
-        }
-
-        public async Task<IEnumerable<Models.Match>> GetAllAsync(GetAllMatchesOptions options, CancellationToken token = default)
-        {
-
-            using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
-            var result = await connection.QueryAsync<Database.Entities.Match>(new CommandDefinition("""
-            select * from Matches where (@seasonId is null or seasonId = @seasonId)
-            """, new
-            {
-                seasonId = options.SeasonId,
-            }, cancellationToken: token));
-
-
-
-            return result.Select(x => new Models.Match(x.Team1Id, x.Team2Id, x.MatchDate)
-            {
-                Id = x.Id,
-                SeasonId = x.SeasonId
-            });
-
-        }
-
-
+        _context = context;
     }
+
+    public async Task<MatchEntity> GetByIdAsync(int id)
+    {
+        return await _context.Matches
+            .Include(m => m.Teams) // Include related teams
+            .ThenInclude(t => t.Players) // Include players in teams
+            .FirstOrDefaultAsync(m => m.Id == id);
+    }
+
+    public async Task<IEnumerable<MatchEntity>> GetAllAsync()
+    {
+        return await _context.Matches
+            .Include(m => m.Teams)
+            .ThenInclude(t => t.Players)
+            .ToListAsync();
+    }
+
+    public async Task AddAsync(MatchEntity matchEntity)
+    {
+        await _context.Matches.AddAsync(matchEntity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(MatchEntity matchEntity)
+    {
+        _context.Matches.Update(matchEntity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var matchEntity = await GetByIdAsync(id);
+        if (matchEntity != null)
+        {
+            _context.Matches.Remove(matchEntity);
+            await _context.SaveChangesAsync();
+        }
+    }
+
 }

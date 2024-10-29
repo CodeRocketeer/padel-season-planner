@@ -9,19 +9,18 @@ namespace Padel.Application.Services.Interfaces
 {
     public interface ISeasonService
     {
-        Task<bool> CreateAsync(Season Season, CancellationToken token = default);
+        Task<Season> CreateAsync(Season Season, CancellationToken token = default);
 
-        Task<Season?> GetByIdAsync(Guid id, Guid? userid = default, CancellationToken token = default);
+        Task<Season?> GetByIdAsync(int id, CancellationToken token = default);
 
-        Task<Season?> GetBySlugAsync(string slug, Guid? userid = default, CancellationToken token = default);
+        Task<IEnumerable<Season>> GetAllAsync( CancellationToken token = default);
+        Task<bool> DeleteByIdAsync(int id, CancellationToken token = default);
 
-        Task<IEnumerable<Season>> GetAllAsync(Guid? userid = default, CancellationToken token = default);
+        Task<Season> UpdateAsync(Season Season, CancellationToken token = default);
 
-        Task<Season?> UpdateAsync(Season Season, Guid? userid = default, CancellationToken token = default);
-
-        Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default);
+        Task<bool> JoinSeasonAsync(int seasonId, Guid userId, CancellationToken token);
 
 
-        Task<bool> ConfirmSeasonAsync(Guid id, Guid? userid = default, CancellationToken token = default);
+
     }
 }

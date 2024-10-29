@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Padel.Application\Padel.Application.csproj" />
+    </ItemGroup>
+
 </Project>

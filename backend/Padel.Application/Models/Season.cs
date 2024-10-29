@@ -1,40 +1,72 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Padel.Application.Database.Entities;
+using System.Xml.Linq;
 
 namespace Padel.Application.Models
 {
     public class Season
     {
-        public Guid Id { get; set; }
-        public int AmountOfMatches { get; set; }
-        public DateTime StartDate { get; set; }
-        public string Title { get; set; }
-        public int DayOfWeek { get; set; }
-
-        public bool? UserParticipates { get; set; }
-
+        public int Id { get; set; }
+        public int AmountOfMatches { get; private set; }
+        public DateTime StartDate { get;private  set; }
+        public string Title { get;private set; }
+        public DayOfWeek DayOfWeek { get; private set; }
         public List<Team> Teams { get; set; }
         public List<Match> Matches { get; set; }
 
-        public Season()
+        public Season(int amountOfMatches, DateTime startDate, string title, DayOfWeek dayOfWeek)
         {
-            Teams = new List<Team>();
-            Matches = new List<Match>();
+
+
+            if (amountOfMatches <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(amountOfMatches), "Amount of matches must be greater than zero.");
+            }
+
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                throw  new ArgumentNullException(nameof(title), "Title cannot be null.");
+            }
+
+
+            AmountOfMatches = amountOfMatches;
+            StartDate = startDate;
+            Title = title;
+            DayOfWeek = dayOfWeek; 
+         
         }
 
-        // Method to add a team to the season
-        public void AddTeam(Team team)
+
+
+        public static SeasonEntity ToEntity(Season season)
         {
-            Teams.Add(team);
+            if (season == null)
+            {
+                throw new ArgumentNullException(nameof(season), "Season cannot be null.");
+            }
+
+            return new SeasonEntity
+            {
+                Id = season.Id != 0 ? season.Id : 0,
+                AmountOfMatches = season.AmountOfMatches,
+                DayOfWeek = season.DayOfWeek,
+                StartDate = DateTime.SpecifyKind(season.StartDate, DateTimeKind.Utc), // Ensure UTC kind
+                Title = season.Title
+            };
         }
 
-        // Method to schedule a match in the season
-        public void ScheduleMatch(Match match)
+        public static Season FromEntity(SeasonEntity seasonEntity)
         {
-            Matches.Add(match);
+            if (seasonEntity == null)
+            {
+                throw new ArgumentNullException(nameof(seasonEntity), "Season entity cannot be null.");
+            }
+
+            return new Season(seasonEntity.AmountOfMatches, seasonEntity.StartDate, seasonEntity.Title, seasonEntity.DayOfWeek)
+            {
+                Id = seasonEntity.Id,
+                        
+
+            };
         }
     }
 }

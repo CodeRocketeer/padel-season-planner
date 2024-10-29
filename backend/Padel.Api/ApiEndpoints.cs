@@ -10,30 +10,28 @@ public static class ApiEndpoints
         private const string Base = $"{ApiBase}/seasons";
 
         public const string Create = Base;
-        public const string Get = $"{Base}/{{idOrSlug}}";
+        public const string Get = $"{Base}/{{id:int}}";
         public const string GetAll = Base;
-        public const string Update = $"{Base}/{{id:guid}}";
-        public const string Delete = $"{Base}/{{id:guid}}";
-        public const string Confirm = $"{Base}/{{id:guid}}/confirm";
+        public const string Update = $"{Base}/{{id:int}}";
+        public const string Delete = $"{Base}/{{id:int}}";
+        public const string Confirm = $"{Base}/{{id:int}}/confirm";
 
         // participate, using bearer token userId
-        public const string Participate = $"{Base}/{{seasonId:guid}}/participate";
+        public const string Join = $"{Base}/{{seasonId:int}}/join";
         public const string Leave = $"{Base}/{{seasonId:guid}}/leave";
     }
 
-    public static class Participants
+    public static class Players
     {
-        private const string Base = $"{ApiBase}/participants";
+        private const string Base = $"{ApiBase}/players";
+        public const string Create = Base;
+        public const string Get = $"{Base}/{{id:int}}"; 
         public const string GetAll = Base;
-
+        public const string Update = $"{Base}/{{id:int}}";
+        public const string Delete = $"{Base}/{{id:int}}";
     }
 
 
-    public static class Seeders
-    {
-        private const string Base = $"{ApiBase}/seeders";
-        public const string SeedParticipants = $"{Base}/participants";
-    
-    }
+
 
 }

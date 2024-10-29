@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Padel.Application.Database;
 using Padel.Application.Repositories;
@@ -13,38 +14,37 @@ public static class ApplicationServiceCollectionExtensions
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddSingleton<ISeasonRepository, SeasonRepository>();
-        services.AddSingleton<IParticipantRepository, ParticipantRepository>();
-        services.AddSingleton<ITeamRepository, TeamRepository>();
-        services.AddSingleton<IMatchRepository, MatchRepository>();
-        services.AddSingleton<IParticipantService, ParticipantService>();
-        services.AddSingleton<ISeasonService, SeasonService>();
-        services.AddSingleton<ISeederService, SeederService>();
-        services.AddSingleton<ITeamService, TeamService>();
-        services.AddSingleton<IMatchService, MatchService>();
-       
+        services.AddScoped<ISeasonRepository, SeasonRepository>();
+        services.AddScoped<IPlayerRepository, PlayerRepository>();
+        services.AddScoped<ITeamRepository, TeamRepository>();
+        services.AddScoped<IMatchRepository, MatchRepository>();
+        
+        services.AddScoped<ISeasonService, SeasonService>();
+        services.AddScoped<IPlayerService, PlayerService>();
+        //services.AddScoped<ISeederService, SeederService>();
+        //services.AddScoped<ITeamService, TeamService>();
+        //services.AddScoped<IMatchService, MatchService>();
+
 
         // Registering rules as transient (or singleton, depending on your needs)
-        services.AddTransient<IRule, UniqueTeamRule>();
-        services.AddTransient<IRule, GenderBalanceRule>();
-        services.AddTransient<IRule, CommonPlayerRule>();
-        services.AddTransient<IRule, ConsecutiveParticipantsRule>();
-        services.AddTransient<IRule, BalancedParticipationRule>();
+        //services.AddTransient<IRule, UniqueTeamRule>();
+        //services.AddTransient<IRule, GenderBalanceRule>();
+        //services.AddTransient<IRule, CommonPlayerRule>();
+        //services.AddTransient<IRule, ConsecutiveParticipantsRule>();
+        //services.AddTransient<IRule, BalancedParticipationRule>();
 
         // Registering RuleSet
-        services.AddSingleton<RuleSet>();
+        services.AddTransient<RuleSet>();
 
-        services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
+        services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Scoped);
 
         return services;
     }
 
-    public static IServiceCollection AddDatabase(this IServiceCollection services,
-        string connectionString)
+    public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
     {
-        services.AddSingleton<IDbConnectionFactory>(_ => 
-            new NpgsqlConnectionFactory(connectionString));
-        services.AddSingleton<DbInitializer>();
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Padel.Application"))); // Specify the migrations assembly
         return services;
     }
 }

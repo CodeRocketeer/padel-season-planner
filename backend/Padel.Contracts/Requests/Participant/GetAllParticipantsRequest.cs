@@ -3,6 +3,6 @@
     public class GetAllParticipantsRequest
     {
         public Guid? UserId { get; init; }
-        public  Guid? SeasonId { get; init; }
+        public  int? SeasonId { get; init; }
     }
 }

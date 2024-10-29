@@ -26,20 +26,20 @@ public class SeasonsController : ControllerBase
         CancellationToken token)
     {
         var season = request.MapToSeason();
-        await _seasonService.CreateAsync(season, token);
-        var SeasonResponse = season.MapToResponse();
-        return CreatedAtAction(nameof(Get), new { idOrSlug = season.Id }, SeasonResponse);
+        var result = await _seasonService.CreateAsync(season, token);
+       
+        var seasonResponse = result.MapToResponse();
+        return CreatedAtAction(nameof(Get), new { id = result.Id }, seasonResponse);
     }
 
 
     [HttpGet(ApiEndpoints.Seasons.Get)]
-    public async Task<IActionResult> Get([FromRoute] string idOrSlug,
+    public async Task<IActionResult> Get([FromRoute] int id,
         CancellationToken token)
     {
-        var userId = HttpContext.GetUserId();
-        var season = Guid.TryParse(idOrSlug, out var id)
-            ? await _seasonService.GetByIdAsync(id, userId, token)
-            : await _seasonService.GetBySlugAsync(idOrSlug, userId, token);
+
+        var season = await _seasonService.GetByIdAsync(id, token);
+
         if (season is null)
         {
             return NotFound();
@@ -53,34 +53,17 @@ public class SeasonsController : ControllerBase
     [HttpGet(ApiEndpoints.Seasons.GetAll)]
     public async Task<IActionResult> GetAll(CancellationToken token)
     {
-        var userId = HttpContext.GetUserId();
-        var seasons = await _seasonService.GetAllAsync(userId, token);
+    
+        var seasons = await _seasonService.GetAllAsync( token);
 
         var seasonsResponse = seasons.MapToResponse();
         return Ok(seasonsResponse);
     }
 
-    [Authorize(AuthConstants.AdminUserPolicyName)]
-    [HttpPut(ApiEndpoints.Seasons.Update)]
-    public async Task<IActionResult> Update([FromRoute] Guid id,
-        [FromBody] UpdateSeasonRequest request,
-        CancellationToken token)
-    {
-        var userId = HttpContext.GetUserId();
-        var season = request.MapToSeason(id);
-        var updatedSeason = await _seasonService.UpdateAsync(season, userId, token);
-        if (updatedSeason is null)
-        {
-            return NotFound();
-        }
-
-        var response = updatedSeason.MapToResponse();
-        return Ok(response);
-    }
 
     [Authorize(AuthConstants.AdminUserPolicyName)]
     [HttpDelete(ApiEndpoints.Seasons.Delete)]
-    public async Task<IActionResult> Delete([FromRoute] Guid id,
+    public async Task<IActionResult> Delete([FromRoute] int id,
         CancellationToken token)
     {
         var deleted = await _seasonService.DeleteByIdAsync(id, token);
@@ -93,19 +76,60 @@ public class SeasonsController : ControllerBase
     }
 
     [Authorize(AuthConstants.AdminUserPolicyName)]
-    [HttpPut(ApiEndpoints.Seasons.Confirm)]
-    public async Task<IActionResult> Confirm([FromRoute] Guid id, CancellationToken token)
+    [HttpPut(ApiEndpoints.Seasons.Update)]
+    public async Task<IActionResult> Update([FromRoute] int id,
+        [FromBody] UpdateSeasonRequest request,
+        CancellationToken token)
     {
-        try
+        //var userId = HttpContext.GetUserId();
+        var season = request.MapToSeason(id);
+        var updatedSeason = await _seasonService.UpdateAsync(season, token);
+        if (updatedSeason is null)
         {
-            var userId = HttpContext.GetUserId();
-            var confirmed = await _seasonService.ConfirmSeasonAsync(id, userId,token);
-            return confirmed ? Ok() : NotFound();
+            return NotFound();
         }
-        catch (DirectoryNotFoundException ex)
-        {
-            // Catch the exception and return a 404 Not Found with the message
-            return NotFound(new { ex.Message });
-        }
+
+        var response = updatedSeason.MapToResponse();
+        return Ok(response);
     }
+
+    [Authorize]
+    [HttpPost(ApiEndpoints.Seasons.Join)]
+    public async Task<IActionResult> Join([FromRoute] int seasonId, CancellationToken token)
+    {
+        var userId = HttpContext.GetUserId(); 
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        var result = await _seasonService.JoinSeasonAsync(seasonId, userId.Value, token);
+
+        if (!result)
+        {
+            return NotFound("The season does not exist or you are already a participant.");
+        }
+
+        return Ok("Successfully joined the season.");
+    }
+
+
+
+
+    //[Authorize(AuthConstants.AdminUserPolicyName)]
+    //[HttpPut(ApiEndpoints.Seasons.Confirm)]
+    //public async Task<IActionResult> Confirm([FromRoute] int id, CancellationToken token)
+    //{
+    //    try
+    //    {
+    //        var userId = HttpContext.GetUserId();
+    //        var confirmed = await _seasonService.ConfirmSeasonAsync(id, userId,token);
+    //        return confirmed ? Ok() : NotFound();
+    //    }
+    //    catch (DirectoryNotFoundException ex)
+    //    {
+    //        // Catch the exception and return a 404 Not Found with the message
+    //        return NotFound(new { ex.Message });
+    //    }
+    //}
 }
