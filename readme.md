@@ -1,6 +1,6 @@
 # Backend Project Setup
 
-This document outlines the steps required to set up and run the backend project using Docker. Follow the instructions below to get started.
+This document outlines the steps required to set up the project and run the database using Docker. Follow the instructions below to get started.
 
 ## Table of Contents
 
