@@ -39,7 +39,7 @@ cd Padel.Application
 Use Docker Compose to start the PostgreSQL database in a Docker container:
 
 ```bash
-docker comose up
+docker compose up
 ```
 
 You can check the Docker app to verify that the PostgreSQL database container is running.
