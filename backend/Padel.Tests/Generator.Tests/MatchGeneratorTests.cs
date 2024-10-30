@@ -1,19 +1,20 @@
 ﻿using FluentAssertions;
+using Padel.Application.Generators;
 using Padel.Application.Services;
 using Padel.Domain.Models;
 
-namespace Padel.Tests.Services.Tests;
+namespace Padel.Tests.Generator;
 
-public class MatchServiceTests
+public class MatchGeneratorTests
 {
 
-    private readonly MatchService _matchService;
-    private readonly TeamService _teamService;
+    private readonly MatchGenerator _matchGenerator;
+    private readonly TeamGenerator _teamGenerator;
 
-    public MatchServiceTests()
+    public MatchGeneratorTests()
     {
-        _matchService = new MatchService();
-        _teamService = new TeamService();
+        _matchGenerator = new MatchGenerator();
+        _teamGenerator = new TeamGenerator();
     }
 
     [Fact]
@@ -29,8 +30,8 @@ public class MatchServiceTests
         };
 
         // Act
-        var teams = await _teamService.GenerateAllTeamCombinations(players);
-        var matches = await _matchService.GenerateAllMatchCombinations(teams.ToList());
+        var teams = await _teamGenerator.GenerateAllTeamCombinations(players);
+        var matches = await _matchGenerator.GenerateAllMatchCombinations(teams.ToList());
 
         // Assert
         teams.Should().HaveCount(6);
@@ -45,7 +46,7 @@ public class MatchServiceTests
 
         // Act
         await FluentActions
-          .Invoking(() => _matchService.GenerateAllMatchCombinations(teams))
+          .Invoking(() => _matchGenerator.GenerateAllMatchCombinations(teams))
           .Should()
           .ThrowAsync<ArgumentException>();
     }
@@ -64,7 +65,7 @@ public class MatchServiceTests
 
         // Act
         await FluentActions
-           .Invoking(() => _matchService.GenerateAllMatchCombinations(teams))
+           .Invoking(() => _matchGenerator.GenerateAllMatchCombinations(teams))
            .Should()
            .ThrowAsync<ArgumentException>();
     }
@@ -84,13 +85,13 @@ public class MatchServiceTests
         };
 
         // Act
-        var matches = await _matchService.GenerateAllMatchCombinations(teams);
+        var matches = await _matchGenerator.GenerateAllMatchCombinations(teams);
 
         // Assert
         matches.Should().BeEmpty(); // No matches should be created due to common players
     }
 
-    
+
 
 
 

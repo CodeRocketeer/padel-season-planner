@@ -11,7 +11,7 @@ public interface IMatchService
 {
 
 
-    Task<IEnumerable<Match>> GenerateAllMatchCombinations(List<Team> teams);
+ 
 
 
 

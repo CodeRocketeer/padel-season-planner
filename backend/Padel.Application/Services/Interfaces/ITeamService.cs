@@ -6,7 +6,6 @@ public interface ITeamService
 {
 
 
-    Task<IEnumerable<Team>> GenerateAllTeamCombinations(List<Player> players);
 
 
 

@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Padel.Application.Database.Entities;
+using Padel.Infrastructure.Entities;
 using System;
 using System.Collections.Generic;
 using Padel.Application.Mappers;
