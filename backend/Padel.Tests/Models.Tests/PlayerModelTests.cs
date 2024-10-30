@@ -21,8 +21,8 @@ public class PlayerModelTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    [InlineData("     ")]
-    public void CreateNewPlayer_EmptyOrNullName_Throws(string name)
+    [InlineData("  ")]
+    public void CreateNewPlayer_EmptyOrNullOrWhiteSpaceName_Throws(string name)
     {
         FluentActions
              .Invoking(() => new Player(Gender.Male, name, Guid.NewGuid()))

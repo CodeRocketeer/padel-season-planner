@@ -10,15 +10,20 @@ public class Team
     // Constructor allowing optional participants
     public Team(Player player1, Player player2)
     {
-        Player1 = player1 ?? throw new ArgumentNullException(nameof(player1));
-        Player2 = player2 ?? throw new ArgumentNullException(nameof(player2));
 
-        if (player1.UserId == player2.UserId)
+        Player1 = player1;
+        Player2 = player2;
+
+        if (!IsValidTeam(player1, player2))
         {
-            throw new ArgumentException("Player1 and Player2 cannot have the same user ID.", nameof(player1));
+            throw new ArgumentException("Invalid team.");
         }
+
     }
 
-    
+
+    public static bool IsValidTeam(Player player1, Player player2) =>
+        player1 != null && player2 != null && player1.UserId != player2.UserId;
+
 
 }

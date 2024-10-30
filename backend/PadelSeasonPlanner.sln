@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Application", "Padel.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PadelContracts", "Padel.Contracts\PadelContracts.csproj", "{D4357D62-B006-489A-A558-AD653D4B470D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Padel.Tests", "Padel.Tests\Padel.Tests.csproj", "{B7E3091E-5FD2-41C9-AF03-092EB1C63453}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Tests", "Padel.Tests\Padel.Tests.csproj", "{B7E3091E-5FD2-41C9-AF03-092EB1C63453}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Padel.Domain", "Padel.Domain\Padel.Domain.csproj", "{00513259-2B3B-403F-918C-C40832E32158}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Domain", "Padel.Domain\Padel.Domain.csproj", "{00513259-2B3B-403F-918C-C40832E32158}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

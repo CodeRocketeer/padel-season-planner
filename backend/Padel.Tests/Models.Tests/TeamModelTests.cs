@@ -37,7 +37,7 @@ public class TeamModelTests
 
         // Assert
         action.Should().Throw<ArgumentException>();
-             
+
     }
 
     [Fact]
@@ -46,13 +46,15 @@ public class TeamModelTests
         // Arrange
         var player2 = new Player(Gender.Female, "Player Two", Guid.NewGuid());
 
+
         // Act
         Action action = () => new Team(null, player2);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>();
-              
+        action.Should().Throw<ArgumentException>();
+
     }
+
     [Fact]
     public void CreateNewTeam_WithNullPlayer2_ThrowsArgumentNullException()
     {
@@ -63,8 +65,8 @@ public class TeamModelTests
         Action action = () => new Team(player1, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>();
-            
+        action.Should().Throw<ArgumentException>();
+
     }
 
     [Fact]
@@ -108,7 +110,7 @@ public class TeamModelTests
         team.Player2.UserId.Should().Be(playerEntity2.UserId);
     }
 
-   
+
     [Fact]
     public void FromEntity_WithIncorrectNumberOfPlayers_ThrowsArgumentException()
     {
@@ -129,7 +131,7 @@ public class TeamModelTests
         // Assert
         action.Should()
               .Throw<ArgumentException>();
-    
+
     }
 
 

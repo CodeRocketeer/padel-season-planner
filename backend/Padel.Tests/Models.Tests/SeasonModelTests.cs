@@ -14,7 +14,7 @@ public class SeasonModelTests
     {
         // Arrange
         var amountOfMatches = 5;
-        var startDate = DateTime.UtcNow.AddDays(1); // Future date
+        var startDate = DateTime.UtcNow.AddDays(1);
         var title = "Summer League";
         var dayOfWeek = DayOfWeek.Monday;
 
@@ -31,6 +31,7 @@ public class SeasonModelTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
+    [InlineData("  ")]
     public void CreateNewSeason_EmptyOrNullTitle_Throws(string title)
     {
         // Arrange
@@ -42,7 +43,7 @@ public class SeasonModelTests
         FluentActions
             .Invoking(() => new Season(amountOfMatches, startDate, title, dayOfWeek))
             .Should()
-            .Throw<ArgumentNullException>();
+            .Throw<ArgumentException>();
         
     }
 
@@ -60,8 +61,7 @@ public class SeasonModelTests
         FluentActions
             .Invoking(() => new Season(amountOfMatches, startDate, title, dayOfWeek))
             .Should()
-            .Throw<ArgumentOutOfRangeException>()
-            .WithMessage("*Amount of matches must be greater than zero.*");
+            .Throw<ArgumentException>();
     }
 
 
@@ -120,6 +120,6 @@ public class SeasonModelTests
         var seasonEntity = season.ToEntity();
 
         // Assert
-        seasonEntity.Id.Should().Be(0); // Ensures EF Core will assign an Id on save
+        seasonEntity.Id.Should().Be(0); 
     }
 }

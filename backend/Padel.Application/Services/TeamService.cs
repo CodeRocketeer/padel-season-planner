@@ -1,9 +1,4 @@
 ﻿using Padel.Application.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Padel.Domain.Models;
 
 namespace Padel.Application.Services;
@@ -18,14 +13,22 @@ public class TeamService : ITeamService
         }
 
         var combinations = new List<Team>();
-        int teamId = 1;  // Start IDs from 1 or any other positive number
+        int teamId = 1;
 
-        for (int i = 0; i < players.Count; i++)
+        // Outer loop through all players
+        foreach (var player in players)
         {
-            for (int j = i + 1; j < players.Count; j++)
+            // Inner loop to pair with players not yet paired with `player`
+            foreach (var otherPlayer in players.Skip(players.IndexOf(player) + 1))
             {
-                var team = new Team(players[i], players[j]) { Id = teamId++ };  // Assign unique ID
-                combinations.Add(team);
+                if (Team.IsValidTeam(player, otherPlayer))
+                {
+                    combinations.Add(new Team(player, otherPlayer)
+                    {
+                        Id = teamId
+                    });
+                    teamId++;
+                }
             }
         }
 

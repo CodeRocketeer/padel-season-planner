@@ -1,5 +1,4 @@
 
-using Padel.Application.Models;
 using Padel.Application.Rules;
 
 
