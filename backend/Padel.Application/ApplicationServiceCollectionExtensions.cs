@@ -27,9 +27,7 @@ public static class ApplicationServiceCollectionExtensions
 
 
         // Registering rules as transient (or singleton, depending on your needs)
-        //services.AddTransient<IRule, UniqueTeamRule>();
         //services.AddTransient<IRule, GenderBalanceRule>();
-        //services.AddTransient<IRule, CommonPlayerRule>();
         //services.AddTransient<IRule, ConsecutiveParticipantsRule>();
         //services.AddTransient<IRule, BalancedParticipationRule>();
 

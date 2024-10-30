@@ -1,4 +1,4 @@
-﻿using Padel.Application.Models;
+﻿
 
 namespace Padel.Domain.Models;
 

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Padel.Application\Padel.Application.csproj" />
+    <ProjectReference Include="..\Padel.Domain\Padel.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

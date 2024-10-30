@@ -1,4 +1,4 @@
-﻿namespace Padel.Application.Models;
+﻿namespace Padel.Domain.Models;
 
 public enum Gender
 {

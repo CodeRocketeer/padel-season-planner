@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Padel.Application.Database.Entities;
 using Padel.Application.Mappers;
-using Padel.Application.Models;
 using Padel.Domain.Models;
 
 
