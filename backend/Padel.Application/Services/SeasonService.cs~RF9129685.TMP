@@ -1,5 +1,5 @@
 ﻿using Padel.Application.Mappers;
-using Padel.Infrastructure.Repositories.Interfaces;
+using Padel.Application.Repositories.Interfaces;
 using Padel.Application.Services.Interfaces;
 using Padel.Domain.Models;
 

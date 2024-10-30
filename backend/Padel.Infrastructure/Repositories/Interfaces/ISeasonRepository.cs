@@ -1,8 +1,8 @@
-﻿using Padel.Application.Database.Entities;
+﻿using Padel.Infrastructure.Entities;
 using Padel.Domain.Models;
 
 
-namespace Padel.Application.Repositories.Interfaces;
+namespace Padel.Infrastructure.Repositories.Interfaces;
 
 public interface ISeasonRepository
 {

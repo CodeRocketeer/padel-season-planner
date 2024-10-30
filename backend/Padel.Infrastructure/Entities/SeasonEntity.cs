@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Padel.Application.Database.Entities;
+namespace Padel.Infrastructure.Entities;
 
 public class SeasonEntity
 {

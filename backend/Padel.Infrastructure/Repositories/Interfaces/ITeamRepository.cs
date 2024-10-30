@@ -1,11 +1,11 @@
-﻿using Padel.Application.Database.Entities;
+﻿using Padel.Infrastructure.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Padel.Application.Repositories.Interfaces;
+namespace Padel.Infrastructure.Repositories.Interfaces;
 
 public interface ITeamRepository
 {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Padel.Application.Database.Entities;
+namespace Padel.Infrastructure.Entities;
 
 public class PlayerEntity
 {

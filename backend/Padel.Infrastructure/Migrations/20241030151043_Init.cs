@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Padel.Application.Migrations
+namespace Padel.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class Init : Migration

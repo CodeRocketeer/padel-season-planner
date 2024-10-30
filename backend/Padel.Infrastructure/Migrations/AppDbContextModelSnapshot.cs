@@ -2,21 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Padel.Application.Database;
+using Padel.Infrastructure;
 
 #nullable disable
 
-namespace Padel.Application.Migrations
+namespace Padel.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241029091559_Init")]
-    partial class Init
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +22,7 @@ namespace Padel.Application.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Padel.Application.Database.Entities.MatchEntity", b =>
+            modelBuilder.Entity("Padel.Infrastructure.Entities.MatchEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -46,7 +43,7 @@ namespace Padel.Application.Migrations
                     b.ToTable("Matches");
                 });
 
-            modelBuilder.Entity("Padel.Application.Database.Entities.PlayerEntity", b =>
+            modelBuilder.Entity("Padel.Infrastructure.Entities.PlayerEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,7 +66,7 @@ namespace Padel.Application.Migrations
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("Padel.Application.Database.Entities.SeasonEntity", b =>
+            modelBuilder.Entity("Padel.Infrastructure.Entities.SeasonEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -95,7 +92,7 @@ namespace Padel.Application.Migrations
                     b.ToTable("Seasons");
                 });
 
-            modelBuilder.Entity("Padel.Application.Database.Entities.TeamEntity", b =>
+            modelBuilder.Entity("Padel.Infrastructure.Entities.TeamEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -143,9 +140,9 @@ namespace Padel.Application.Migrations
                     b.ToTable("TeamPlayers", (string)null);
                 });
 
-            modelBuilder.Entity("Padel.Application.Database.Entities.MatchEntity", b =>
+            modelBuilder.Entity("Padel.Infrastructure.Entities.MatchEntity", b =>
                 {
-                    b.HasOne("Padel.Application.Database.Entities.SeasonEntity", "Season")
+                    b.HasOne("Padel.Infrastructure.Entities.SeasonEntity", "Season")
                         .WithMany("Matches")
                         .HasForeignKey("SeasonId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -154,9 +151,9 @@ namespace Padel.Application.Migrations
                     b.Navigation("Season");
                 });
 
-            modelBuilder.Entity("Padel.Application.Database.Entities.TeamEntity", b =>
+            modelBuilder.Entity("Padel.Infrastructure.Entities.TeamEntity", b =>
                 {
-                    b.HasOne("Padel.Application.Database.Entities.MatchEntity", "Match")
+                    b.HasOne("Padel.Infrastructure.Entities.MatchEntity", "Match")
                         .WithMany("Teams")
                         .HasForeignKey("MatchId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -167,13 +164,13 @@ namespace Padel.Application.Migrations
 
             modelBuilder.Entity("PlayerEntitySeasonEntity", b =>
                 {
-                    b.HasOne("Padel.Application.Database.Entities.PlayerEntity", null)
+                    b.HasOne("Padel.Infrastructure.Entities.PlayerEntity", null)
                         .WithMany()
                         .HasForeignKey("PlayersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Padel.Application.Database.Entities.SeasonEntity", null)
+                    b.HasOne("Padel.Infrastructure.Entities.SeasonEntity", null)
                         .WithMany()
                         .HasForeignKey("SeasonsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -182,25 +179,25 @@ namespace Padel.Application.Migrations
 
             modelBuilder.Entity("PlayerEntityTeamEntity", b =>
                 {
-                    b.HasOne("Padel.Application.Database.Entities.PlayerEntity", null)
+                    b.HasOne("Padel.Infrastructure.Entities.PlayerEntity", null)
                         .WithMany()
                         .HasForeignKey("PlayersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Padel.Application.Database.Entities.TeamEntity", null)
+                    b.HasOne("Padel.Infrastructure.Entities.TeamEntity", null)
                         .WithMany()
                         .HasForeignKey("TeamsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Padel.Application.Database.Entities.MatchEntity", b =>
+            modelBuilder.Entity("Padel.Infrastructure.Entities.MatchEntity", b =>
                 {
                     b.Navigation("Teams");
                 });
 
-            modelBuilder.Entity("Padel.Application.Database.Entities.SeasonEntity", b =>
+            modelBuilder.Entity("Padel.Infrastructure.Entities.SeasonEntity", b =>
                 {
                     b.Navigation("Matches");
                 });

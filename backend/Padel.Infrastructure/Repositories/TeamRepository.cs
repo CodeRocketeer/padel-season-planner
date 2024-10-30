@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Padel.Application.Database;
-using Padel.Application.Database.Entities;
-using Padel.Application.Repositories.Interfaces;
+using Padel.Infrastructure.Entities;
+using Padel.Infrastructure;
+using Padel.Infrastructure.Repositories.Interfaces;
 
-namespace Padel.Application.Repositories;
+namespace Padel.Infrastructure.Repositories;
 
 
 public class TeamRepository : ITeamRepository

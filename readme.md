@@ -28,10 +28,10 @@ Navigate to the PadelSeasonPlanner solution directory
 cd backend
 ```
 
-3. **Navigate to the Padel.Application Directory**
+3. **Navigate to the Padel.Infrastructure Directory**
 
 ```bash
-cd Padel.Application
+cd Padel.Infrastructure
 ```
 
 4. **Start the PostgreSQL Database**

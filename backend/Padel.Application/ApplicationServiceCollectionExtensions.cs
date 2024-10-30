@@ -1,12 +1,13 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Padel.Application.Database;
-using Padel.Application.Repositories;
-using Padel.Application.Repositories.Interfaces;
+using Padel.Infrastructure;
 using Padel.Application.Rules;
 using Padel.Application.Services;
 using Padel.Application.Services.Interfaces;
+using Padel.Infrastructure.Repositories.Interfaces;
+using Padel.Infrastructure.Repositories;
+
 
 namespace Padel.Application;
 
@@ -41,7 +42,7 @@ public static class ApplicationServiceCollectionExtensions
     public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Padel.Application"))); // Specify the migrations assembly
+            options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Padel.Infrastructure"))); // Specify the migrations assembly
         return services;
     }
 }
