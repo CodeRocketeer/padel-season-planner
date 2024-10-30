@@ -1,5 +1,4 @@
-﻿using Padel.Application.Models;
-using Padel.Application.Services.Interfaces;
+﻿using Padel.Application.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

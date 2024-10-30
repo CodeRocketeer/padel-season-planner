@@ -1,5 +1,5 @@
 ﻿using Padel.Application.Database.Entities;
-using Padel.Application.Models;
+using Padel.Domain.Models;
 
 
 namespace Padel.Application.Repositories.Interfaces;

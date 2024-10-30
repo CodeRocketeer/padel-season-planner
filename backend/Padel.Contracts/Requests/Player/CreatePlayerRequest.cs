@@ -1,5 +1,4 @@
-﻿using Padel.Application.Models;
-
+﻿using Padel.Domain.Models;
 namespace PadelContracts.Requests.Player;
 
 public class CreatePlayerRequest

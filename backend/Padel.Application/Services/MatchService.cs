@@ -1,10 +1,4 @@
-﻿using Padel.Application.Models;
-using Padel.Application.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Padel.Application.Services.Interfaces;
 using Padel.Domain.Models;
 
 namespace Padel.Application.Services;

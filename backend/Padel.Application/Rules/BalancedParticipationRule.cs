@@ -1,8 +1,7 @@
-﻿using Padel.Application.Models;
+﻿using Padel.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Padel.Domain.Models;
 
 namespace Padel.Application.Rules
 {

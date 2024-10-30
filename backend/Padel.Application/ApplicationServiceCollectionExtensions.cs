@@ -18,12 +18,11 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<IPlayerRepository, PlayerRepository>();
         services.AddScoped<ITeamRepository, TeamRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();
-        
+        services.AddScoped<ITeamService, TeamService>();
+        services.AddScoped<IMatchService, MatchService>();        
         services.AddScoped<ISeasonService, SeasonService>();
         services.AddScoped<IPlayerService, PlayerService>();
         //services.AddScoped<ISeederService, SeederService>();
-        //services.AddScoped<ITeamService, TeamService>();
-        //services.AddScoped<IMatchService, MatchService>();
 
 
         // Registering rules as transient (or singleton, depending on your needs)

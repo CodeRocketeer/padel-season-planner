@@ -1,6 +1,6 @@
 # Backend Project Setup
 
-This document outlines the steps required to set up the project and run the database using Docker. Follow the instructions below to get started.
+This document outlines the steps required to set up and run the backend project using Docker. Follow the instructions below to get started.
 
 ## Table of Contents
 
@@ -44,19 +44,19 @@ docker compose up
 
 You can check the Docker app to verify that the PostgreSQL database container is running.
 
+5. **Update the database with migrations**
+
+To update the database with migrations, first go to the Padel.Api project directory and run the following command:
+
+```bash
+dotnet ef database update
+```
+
 ## Running the Application
 
 Once the PostgreSQL database is running, you can build and run the Padel.Api to establish a connection to the database:
 
-1. **Navigate to the Padel.API Directory**
-
-Change back to the main directory and then into Padel.API:
-
-```bash
-cd ../Padel.API
-```
-
-2. **Run the Api**
+1. **Run the Api**
 
 Enable HTTPS on the Padel.Api project and run it. This will build the application, which is necessary for running tests.
 
@@ -66,4 +66,5 @@ Enable HTTPS on the Padel.Api project and run it. This will build the applicatio
 
 1. **Navigate to the Padel.Tests Directory**
 2. **Run the Tests**
-   one time build of Padel.Api is needed for the tests to run.
+
+   One time build of Padel.Api is needed for the tests to run.
