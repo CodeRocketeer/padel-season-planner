@@ -25,5 +25,8 @@ public class Team
     public static bool IsValidTeam(Player player1, Player player2) =>
         player1 != null && player2 != null && player1.UserId != player2.UserId;
 
-
+    public List<Player> GetParticipants()
+    {
+        return new List<Player> { Player1, Player2 };
+    }
 }

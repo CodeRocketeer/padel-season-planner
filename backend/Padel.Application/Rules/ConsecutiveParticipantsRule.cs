@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Padel.Domain.Models;
+﻿using Padel.Domain.Models;
 
 namespace Padel.Application.Rules
 {
@@ -11,34 +6,24 @@ namespace Padel.Application.Rules
     {
         public int Weight => 80; // Importance of this rule
 
-        public decimal Validate(Match match, List<Match> scheduledMatches, List<Player> participants)
+        public decimal Validate(Match match, List<Match> scheduledMatches)
         {
-            //// Get last match from the planned matches
-            //var lastMatch = scheduledMatches
-            //    .OrderByDescending(m => m.MatchDate)
-            //    .FirstOrDefault();
+            if (scheduledMatches == null || !scheduledMatches.Any())
+            {
+                return 0; // No previous match, so no fault
+            }
 
-            //// If there's no last match, return 0 (no fault)
-            //if (lastMatch == null)
-            //    return 0;
+            var lastAddedMatch = scheduledMatches.Last();
 
-            //// Get participants from both teams in the last match
-            //var lastMatchParticipants = lastMatch.Team1.GetParticipants()
-            //    .Concat(lastMatch.Team2.GetParticipants())
-            //    .ToList();
+            var lastAddedMatchPlayers = lastAddedMatch.Team1.GetParticipants().Concat(lastAddedMatch.Team2.GetParticipants()).ToList();
+            var currentMatchPlayers = match.Team1.GetParticipants().Concat(match.Team2.GetParticipants()).ToList();
 
-            //// Get participants from both teams in the current match
-            //var currentMatchParticipants = match.Team1.GetParticipants()
-            //    .Concat(match.Team2.GetParticipants())
-            //    .ToList();
-
-            //// Check if any participants from the current match played in the last match
-            //if (currentMatchParticipants.Any(p => lastMatchParticipants.Contains(p)))
-            //{
-            //    return 100; // Return full fault if participants played consecutive matches
-            //}
+            if (currentMatchPlayers.Any(player => lastAddedMatchPlayers.Contains(player)))
+            {
+                return 100; 
+            }
 
             return 0;
-        }   
+        }
     }
 }

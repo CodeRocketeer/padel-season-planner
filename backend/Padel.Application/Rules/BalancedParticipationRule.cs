@@ -9,7 +9,7 @@ namespace Padel.Application.Rules
     {
         public int Weight => 85; // Importance of this rule
 
-        public decimal Validate(Match match, List<Match> scheduledMatches, List<Player> totalParticipants)
+        public decimal Validate(Match match, List<Match> scheduledMatches)
         {
             //// Step 1: Check for edge cases: No matches or no participants
             //if (scheduledMatches == null || !scheduledMatches.Any() || totalParticipants == null || !totalParticipants.Any())

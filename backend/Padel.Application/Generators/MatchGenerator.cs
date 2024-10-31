@@ -9,7 +9,7 @@ namespace Padel.Application.Generators
 {
     public class MatchGenerator
     {
-        public async Task<IEnumerable<Match>> GenerateAllMatchCombinations(List<Team> teams)
+        public async Task<List<Match>> GenerateAllMatchCombinations(List<Team> teams)
         {
             if (teams == null || teams.Count < 2)
             {

@@ -86,6 +86,24 @@ public class TeamGenerartorTests
             .WithMessage("At least two players are required to form teams.");
     }
 
+    [Fact]
+    public async Task GenerateAllTeamCombinations_WithCommonPlayer_Should_ReturnEmptyList()
+    {
+        //Arrange
+        var commonUserId = Guid.NewGuid();
+        var players = new List<Player>
+        {
+            new Player(Gender.Male, "Player 1", commonUserId),
+            new Player(Gender.Female, "Player 2", commonUserId),     
+        };
+
+        // Act
+        var teams = await _teamGenerator.GenerateAllTeamCombinations(players);
+
+        // Act & Assert
+        teams.Should().HaveCount(0);
+    }
+
 
 
 

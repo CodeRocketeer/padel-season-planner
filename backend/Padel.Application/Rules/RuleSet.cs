@@ -12,13 +12,13 @@ public class RuleSet
         Rules = new List<IRule>(rules);
     }
 
-    public decimal Validate(Match match, List<Match> scheduledMatches, List<Player> participants)
+    public decimal Validate(Match match, List<Match> scheduledMatches)
     {
         decimal totalFaultPercentage = 0;
 
         foreach (var rule in Rules)
         {
-            totalFaultPercentage += rule.Validate(match, scheduledMatches, participants) * (rule.Weight / 100m); // Weighted fault percentage
+            totalFaultPercentage += rule.Validate(match, scheduledMatches) * (rule.Weight / 100m); // Weighted fault percentage
         }
 
         return totalFaultPercentage; // Total fault percentage for the matches
