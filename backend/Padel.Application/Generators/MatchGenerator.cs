@@ -1,9 +1,4 @@
 ﻿using Padel.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Padel.Application.Generators
 {
@@ -13,8 +8,9 @@ namespace Padel.Application.Generators
         {
             if (teams == null || teams.Count < 2)
             {
-                throw new ArgumentException("At least two teams are required to form matches.");
+                return new List<Match>();
             }
+
 
             var possibleMatches = new List<Match>();
 
@@ -30,5 +26,39 @@ namespace Padel.Application.Generators
             }
             return await Task.FromResult(possibleMatches);
         }
+
+        public async Task<List<List<Match>>> GenerateAllMatchSchedulesSets(List<Match> allMatchCombinations, int amountOfmatches, int numberOfRandomSets = 50)
+        {
+            // List of sets of scheduled matches
+            var matchSchedulesSets = new List<List<Match>>();
+            var random = new Random();
+
+            for (int i = 0; i < numberOfRandomSets; i++)
+            {
+                var scheduledMatches = new List<Match>();
+
+                for (int j = 0; j < amountOfmatches; j++)
+                {
+                    scheduledMatches.Add(GetRandomMatch(allMatchCombinations));
+                }
+
+                matchSchedulesSets.Add(scheduledMatches);
+
+            }
+
+            return await Task.FromResult(matchSchedulesSets);
+
+        }
+
+        private static Match GetRandomMatch(List<Match> allPossibleMatches)
+        {
+
+
+            var random = new Random();
+            int randomIndex = random.Next(0, allPossibleMatches.Count);
+
+            return allPossibleMatches[randomIndex];
+        }
+
     }
 }

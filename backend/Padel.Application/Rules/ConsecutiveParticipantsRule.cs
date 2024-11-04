@@ -1,29 +1,61 @@
 ﻿using Padel.Domain.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Padel.Application.Rules
 {
     public class ConsecutiveParticipantsRule : IRule
     {
-        public int Weight => 80; // Importance of this rule
+        public int Weight => 50; // Base weight for this rule
 
-        public decimal Validate(Match match, List<Match> scheduledMatches)
+        public int Validate(List<Match> matchSet, List<Player> playerList)
         {
-            if (scheduledMatches == null || !scheduledMatches.Any())
+            if (matchSet == null || !matchSet.Any())
             {
-                return 0; // No previous match, so no fault
+                return 100; // Max fault if there are no matches
             }
 
-            var lastAddedMatch = scheduledMatches.Last();
+            int violationCount = 0;
+            var consecutiveMatches = new Dictionary<Player, int>();
 
-            var lastAddedMatchPlayers = lastAddedMatch.Team1.GetParticipants().Concat(lastAddedMatch.Team2.GetParticipants()).ToList();
-            var currentMatchPlayers = match.Team1.GetParticipants().Concat(match.Team2.GetParticipants()).ToList();
-
-            if (currentMatchPlayers.Any(player => lastAddedMatchPlayers.Contains(player)))
+            for (int i = 0; i < matchSet.Count; i++)
             {
-                return 100; 
+                var currentMatch = matchSet[i];
+                var currentPlayers = currentMatch.Team1.GetParticipants().Concat(currentMatch.Team2.GetParticipants()).ToList();
+
+                foreach (var player in currentPlayers)
+                {
+                    // If the player was already counted in the previous match
+                    if (i > 0 && consecutiveMatches.ContainsKey(player) && consecutiveMatches[player] > 0)
+                    {
+                        // Increment the count of consecutive matches for this player
+                        consecutiveMatches[player]++;
+                    }
+                    else
+                    {
+                        // Initialize or reset the count
+                        consecutiveMatches[player] = 1;
+                    }
+
+                    // Count as a fault if they participated in more than 1 consecutive match
+                    if (consecutiveMatches[player] > 1)
+                    {
+                        violationCount++; // Increment violation count for each consecutive match
+                    }
+                }
+
+                // Reset the count for players who did not participate in this match
+                foreach (var player in consecutiveMatches.Keys.ToList())
+                {
+                    if (!currentPlayers.Contains(player))
+                    {
+                        consecutiveMatches[player] = 0; // Reset if not participating
+                    }
+                }
             }
 
-            return 0;
+            // Return the total count of violations as fault points
+            return violationCount;
         }
     }
 }

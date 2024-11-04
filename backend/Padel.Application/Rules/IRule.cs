@@ -10,5 +10,5 @@ namespace Padel.Application.Rules;
 public interface IRule
 {
     int Weight { get; } // Importance of the rule
-    decimal Validate(Match match, List<Match> scheduledMatches); // Method to validate matches
+    int Validate(List<Match> matchSet , List<Player> playerList); // Method to validate matches
 }

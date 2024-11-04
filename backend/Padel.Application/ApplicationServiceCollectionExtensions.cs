@@ -27,11 +27,13 @@ public static class ApplicationServiceCollectionExtensions
 
 
         // Registering rules as transient (or singleton, depending on your needs)
-        services.AddTransient<IRule, ConsecutiveParticipantsRule>();
-        //services.AddTransient<IRule, BalancedParticipationRule>();
+        services.AddScoped<IRule, ConsecutiveParticipantsRule>();
+        services.AddScoped<IRule, AllPlayersParticipateRule>();
+        services.AddScoped<IRule, GenderBalanceRule>();
+        services.AddScoped<IRule, BalancedParticipationRule>();
 
         // Registering RuleSet
-        services.AddTransient<RuleSet>();
+        services.AddScoped<RuleSet>();
 
         services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Scoped);
 

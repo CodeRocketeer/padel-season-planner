@@ -1,9 +1,4 @@
 ﻿using Padel.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Padel.Application.Generators
 {
@@ -13,7 +8,7 @@ namespace Padel.Application.Generators
         {
             if (players == null || players.Count < 2)
             {
-                throw new ArgumentException("At least two players are required to form teams.");
+                return new List<Team>();
             }
 
             var combinations = new List<Team>();

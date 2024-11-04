@@ -11,11 +11,10 @@ public class Match
     public DateTime MatchDate { get; set; }
 
 
-    // Constructor allowing teams to be created with IDs only
+
+    // Constructor that allows specifying gender balance
     public Match(Team team1, Team team2)
     {
-
-    
         Team1 = team1;
         Team2 = team2;
 
@@ -23,6 +22,8 @@ public class Match
         {
             throw new ArgumentException("Invalid match.");
         }
+
+
     }
 
     public static bool IsValidMatch(Team team1, Team team2)
@@ -44,15 +45,26 @@ public class Match
             return false;
         }
 
-        return AreTeamsGenderBalanced(team1, team2);
+        // Ensure gender balance only if needed
+        //if (!AreTeamsGenderBalanced(team1, team2))
+        //{
+        //    return false;
+        //}
+
+        return true;
     }
 
     private static bool AreTeamsComposedOfDifferentUsers(Team team1, Team team2)
     {
-        return !(team1.Player1?.UserId == team2.Player1?.UserId ||
-                 team1.Player1?.UserId == team2.Player2?.UserId ||
-                 team1.Player2?.UserId == team2.Player1?.UserId ||
-                 team1.Player2?.UserId == team2.Player2?.UserId);
+        var userIds = new[]
+        {
+                team1.Player1?.UserId,
+                team1.Player2?.UserId,
+                team2.Player1?.UserId,
+                team2.Player2?.UserId
+        };
+
+        return userIds.Distinct().Count() == 4;
     }
 
 

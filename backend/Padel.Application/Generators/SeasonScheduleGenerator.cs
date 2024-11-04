@@ -20,50 +20,54 @@ namespace Padel.Application.Generators
 
         public async Task<Season> GenerateSeasonSchedule(Season season, List<Player> players)
         {
+            if (players == null || players.Count < 2)
+            {
+                throw new ArgumentException("At least 2 players are required to generate a season schedule.");
+            }
+
+            // Calculate minimum matches required to ensure all players participate
+            int minMatchesNeeded = (int)Math.Ceiling(players.Count / 4.0);
+            season.AmountOfMatches = Math.Max(season.AmountOfMatches, minMatchesNeeded);
+
 
             var allTeamCombinations = await _teamGenerator.GenerateAllTeamCombinations(players);
             var allMatchCombinations = await _matchGenerator.GenerateAllMatchCombinations(allTeamCombinations);
-            var bestScheduledMatches = await GenerateBestScheduledMatches(allMatchCombinations);
+            var bestMatchScheduleSet = await GenerateBestMatchScheduleSet(allMatchCombinations, season.AmountOfMatches, players);
 
-            season.Matches = bestScheduledMatches;
+
+            season.Matches = bestMatchScheduleSet;
 
             return await Task.FromResult(season);
         }
 
 
-        private async Task<List<Match>> GenerateBestScheduledMatches(List<Match> allMatchCombinations)
+        public async Task<List<Match>> GenerateBestMatchScheduleSet(List<Match> allMatchCombinations, int amountOfMatches, List<Player> playerList)
         {
-            var scheduledMatches = new List<Match>();
-            var faultyMatches = new List<Match>();
+            var allMatchSchedulesSets = await _matchGenerator.GenerateAllMatchSchedulesSets(allMatchCombinations, amountOfMatches, 5000);
 
-            // step 1: try to add perfect matches to the scheduledMatches (validation score == 0)
-            scheduledMatches = await AddPerfectMatches(allMatchCombinations, scheduledMatches, faultyMatches);
+            List<Match> bestMatchSet = null;
+            int lowestFaultPoints = int.MaxValue;
 
-            // step 2: if the amountOfMatches is not enough, try to add faulty matches with the lowest faultPercentage
-
-            return await Task.FromResult(scheduledMatches);
-        }
-
-
-        private async Task<List<Match>> AddPerfectMatches(List<Match> allMatchCombinations, List<Match> scheduledMatches, List<Match> faultyMatches)
-        {
-
-            foreach (var match in allMatchCombinations)
+            foreach (var matchSet in allMatchSchedulesSets)
             {
-                var validationResult = _ruleSet.Validate(match, scheduledMatches);
+                int faultPoints = _ruleSet.Validate(matchSet, playerList);
 
-                if (validationResult == 0)
+                if (faultPoints == 0)
                 {
-
-                    scheduledMatches.Add(match);
+                    return matchSet;
                 }
-                else
+                if (faultPoints < lowestFaultPoints)
                 {
-                    faultyMatches.Add(match);
+                    lowestFaultPoints= faultPoints;
+                    bestMatchSet = matchSet;
                 }
             }
 
-            return await Task.FromResult(scheduledMatches);
+            return await Task.FromResult(bestMatchSet ?? new List<Match>());
         }
+
+
+
+
     }
 }

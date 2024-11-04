@@ -125,7 +125,7 @@ namespace Padel.Tests.Generator.Tests
             var missingPlayers = randomPlayers.Except(allParticipants).ToList();
 
 
-
+            
 
             allParticipants.Should().HaveCount(allPlayersCount);
         }
@@ -141,68 +141,36 @@ namespace Padel.Tests.Generator.Tests
             // Act
             var result = await _seasonScheduleGenerator.GenerateSeasonSchedule(season, randomPlayers);
 
-            // Ensure that the schedule has matches
-            result.Matches.Should().NotBeEmpty("The schedule should contain matches.");
-
-            // Count the total number of matches
-            int totalMatches = result.Matches.Count;
-
-            // Calculate the maximum possible number of participations for each player
-            // Assuming that each match involves 4 players (2 per team), and each player should ideally be distributed evenly
-            double averageParticipation = (totalMatches * 4.0) / randomPlayers.Count;
-
-            // Define a higher tolerance (if appropriate)
-            const int tolerance = 2; // Allow players to deviate by ±2 matches from the average
-
-            // Recalculate the min and max participation
-            int minParticipation = (int)Math.Floor(averageParticipation) - tolerance;
-            int maxParticipation = (int)Math.Ceiling(averageParticipation) + tolerance;
-
-            // Count the participation of each player across all matches
+            // Count the participation of each player
             var playerParticipationCount = new Dictionary<Player, int>();
             foreach (var player in randomPlayers)
             {
-                int participationCount = result.Matches.Count(match =>
+                playerParticipationCount[player] = result.Matches.Count(match =>
                     match.Team1.GetParticipants().Contains(player) || match.Team2.GetParticipants().Contains(player));
-                playerParticipationCount[player] = participationCount;
             }
 
-            // Identify players who are out of the acceptable participation range
-            var playersOutOfRange = playerParticipationCount
-                .Where(kvp => kvp.Value < minParticipation || kvp.Value > maxParticipation)
+            // Calculate average participation
+            var averageParticipation = playerParticipationCount.Values.Average();
+
+            // Define a tolerance (margin)
+            const double tolerance = 1.0; // Allow a margin of 1 match
+
+            // Identify and print players who have more participation than allowed
+            var playersWithHighParticipation = playerParticipationCount
+                .Where(kvp => kvp.Value > averageParticipation + tolerance)
                 .Select(kvp => kvp.Key)
                 .ToList();
 
-            // Calculate the number of players who are out of the range
-            int countOutOfRange = playersOutOfRange.Count;
-
-            // Define an acceptable number of players who can be out of the tolerance range
-            const int maxPlayersOutOfRange = 2; // Adjust this based on your scenario's tolerance for imbalance
-
-            // Assert that the number of players out of range does not exceed the acceptable limit
-            countOutOfRange.Should().BeLessThanOrEqualTo(maxPlayersOutOfRange,
-                $"The number of players with participation outside the acceptable range should not exceed {maxPlayersOutOfRange}. " +
-                $"Found {countOutOfRange} players out of range.");
-
-
-            // Assert that each player's participation count falls within the calculated range
-            foreach (var kvp in playerParticipationCount)
+            // Assert that each player's participation is within the tolerance range
+            foreach (var participation in playerParticipationCount.Values)
             {
-                kvp.Value.Should().BeInRange(
-                    minParticipation,
-                    maxParticipation,
-                    $"Player {kvp.Key.Name}'s participation ({kvp.Value}) should be within the range of {minParticipation} to {maxParticipation} matches.");
+                participation.Should().BeInRange((int)(averageParticipation - tolerance), (int)(averageParticipation + tolerance),
+                    $"Each player's participation should be within the tolerance range of the average ({averageParticipation:F2} ± {tolerance})");
             }
         }
 
-
-
-        [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(3)]
-        [InlineData(4)]
-        public async Task GenerateSeasonSchedule_Should_NotHaveMoreThanFiveTotalConsecutiveMatches(int maxConsecutiveMatches)
+        [Fact]
+        public async Task GenerateSeasonSchedule_Should_NotHaveConsecutiveMatchesForPlayers_WithZeroTolerance()
         {
             // Arrange
             var season = CreateRandomSeason();
@@ -214,11 +182,10 @@ namespace Padel.Tests.Generator.Tests
             // Ensure that the schedule has matches
             result.Matches.Should().NotBeEmpty();
 
-            // Track the total count of consecutive matches
-            int totalConsecutiveMatches = 0;
+            // Track the players' last match index
             var playerLastMatchIndex = new Dictionary<Player, int>();
 
-            // Iterate over matches to ensure total consecutive matches do not exceed 5
+            // Iterate over matches to ensure no player is in consecutive matches
             for (int matchIndex = 0; matchIndex < result.Matches.Count; matchIndex++)
             {
                 var match = result.Matches[matchIndex];
@@ -226,38 +193,18 @@ namespace Padel.Tests.Generator.Tests
                 // Get participants of the current match
                 var currentMatchPlayers = match.Team1.GetParticipants().Concat(match.Team2.GetParticipants()).ToList();
 
-                // Check if the current match continues from the last match
-                bool hasConsecutiveParticipants = false;
-
                 foreach (var player in currentMatchPlayers)
                 {
                     // Check if the player has played in the previous match
                     if (playerLastMatchIndex.TryGetValue(player, out int lastMatchIndex))
                     {
-                        // If any player has played in the last match, we have consecutive participation
-                        if (matchIndex == lastMatchIndex + 1)
-                        {
-                            hasConsecutiveParticipants = true;
-                        }
+                        // With a tolerance of 0, ensure players do not participate in consecutive matches
+                        var matchesSinceLastPlayed = matchIndex - lastMatchIndex;
+                        matchesSinceLastPlayed.Should().BeGreaterThan(1,
+                            $"Player {player.Name} should not participate in consecutive matches (tolerance = 0).");
                     }
-                }
 
-                if (hasConsecutiveParticipants)
-                {
-                    totalConsecutiveMatches++;
-                }
-                else
-                {
-                    totalConsecutiveMatches = 1; // Reset to current match
-                }
-
-                // Ensure that total consecutive matches do not exceed 2
-                totalConsecutiveMatches.Should().BeLessThanOrEqualTo(maxConsecutiveMatches,
-                    $"The total count of consecutive matches should not exceed {maxConsecutiveMatches}. Current count: {totalConsecutiveMatches}.");
-
-                // Update the last match index for all current players
-                foreach (var player in currentMatchPlayers)
-                {
+                    // Update the player's last match index
                     playerLastMatchIndex[player] = matchIndex;
                 }
             }

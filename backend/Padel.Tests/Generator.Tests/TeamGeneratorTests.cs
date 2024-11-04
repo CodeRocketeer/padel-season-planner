@@ -40,22 +40,19 @@ public class TeamGenerartorTests
     }
 
     [Fact]
-    public async Task GenerateAllTeamCombinations_EmptyList_Throws()
+    public async Task GenerateAllTeamCombinations_EmptyList_ReturnsEmptyList()
     {
         // Arrange
         var players = new List<Player>(); // Empty list
 
         // Act & Assert
-        await FluentActions
-            .Invoking(() => _teamGenerator.GenerateAllTeamCombinations(players))
-            .Should()
-            .ThrowAsync<ArgumentException>()
-            .WithMessage("At least two players are required to form teams.");
+        var teams = await _teamGenerator.GenerateAllTeamCombinations(players);
+        teams.Should().BeEmpty();
 
     }
 
     [Fact]
-    public async Task GenerateAllTeamCombinations_SinglePlayer_Throws()
+    public async Task GenerateAllTeamCombinations_SinglePlayer_ReturnsEmptyList()
     {
         // Arrange
         var players = new List<Player>
@@ -64,26 +61,21 @@ public class TeamGenerartorTests
         };
 
         // Act & Assert
-        await FluentActions
-            .Invoking(() => _teamGenerator.GenerateAllTeamCombinations(players))
-            .Should()
-            .ThrowAsync<ArgumentException>()
-            .WithMessage("At least two players are required to form teams.");
+        var teams = await _teamGenerator.GenerateAllTeamCombinations(players);
+        teams.Should().BeEmpty();
 
     }
 
     [Fact]
-    public async Task GenerateAllTeamCombinations_NullList_Throws()
+    public async Task GenerateAllTeamCombinations_NullList_ReturnsEmptyList()
     {
         // Arrange
         List<Player> players = null; // Null list
 
         // Act & Assert
-        await FluentActions
-            .Invoking(() => _teamGenerator.GenerateAllTeamCombinations(players))
-            .Should()
-            .ThrowAsync<ArgumentException>()
-            .WithMessage("At least two players are required to form teams.");
+        var teams = await _teamGenerator.GenerateAllTeamCombinations(players);
+        teams.Should().BeEmpty();
+
     }
 
     [Fact]
@@ -94,15 +86,40 @@ public class TeamGenerartorTests
         var players = new List<Player>
         {
             new Player(Gender.Male, "Player 1", commonUserId),
-            new Player(Gender.Female, "Player 2", commonUserId),     
+            new Player(Gender.Female, "Player 2", commonUserId),
         };
 
         // Act
         var teams = await _teamGenerator.GenerateAllTeamCombinations(players);
 
         // Act & Assert
-        teams.Should().HaveCount(0);
+        teams.Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task GenerateALlTeamCombinations_Should_ContainAllPlayers()
+    {
+        // Arrange
+        var players = new List<Player>
+        {
+            new Player(Gender.Male, "Player 1", Guid.NewGuid()),
+            new Player(Gender.Female, "Player 2", Guid.NewGuid()),
+            new Player(Gender.Male, "Player 3", Guid.NewGuid()),
+            new Player(Gender.Female, "Player 4", Guid.NewGuid()),
+
+        };
+
+        // Act
+        var teams = await _teamGenerator.GenerateAllTeamCombinations(players);
+
+        var allTeamsPlayers = teams.SelectMany(t => new List<Player> { t.Player1, t.Player2 });
+        // remove duplicates 
+        allTeamsPlayers = allTeamsPlayers.Distinct();
+        // Act & Assert
+        allTeamsPlayers.Should().HaveCount(players.Count);
+    }
+
+
 
 
 

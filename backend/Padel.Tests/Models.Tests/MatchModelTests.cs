@@ -230,54 +230,54 @@ public class MatchModelTests
         isValid.Should().BeTrue();
     }
 
-    [Fact]
-    public void IsValidMatch_MM_vs_FF_ShouldThrow()
-    {
-        // Arrange
-        var player1 = new Player(Gender.Male, "Player 1", Guid.NewGuid());
-        var player2 = new Player(Gender.Male, "Player 2", Guid.NewGuid());
-        var team1 = new Team(player1, player2)
-        {
-            Id = 1
-        };
+    //[Fact]
+    //public void IsValidMatch_MM_vs_FF_ShouldThrow()
+    //{
+    //    // Arrange
+    //    var player1 = new Player(Gender.Male, "Player 1", Guid.NewGuid());
+    //    var player2 = new Player(Gender.Male, "Player 2", Guid.NewGuid());
+    //    var team1 = new Team(player1, player2)
+    //    {
+    //        Id = 1
+    //    };
 
-        var player3 = new Player(Gender.Female, "Player 3", Guid.NewGuid());
-        var player4 = new Player(Gender.Female, "Player 4", Guid.NewGuid());
-        var team2 = new Team(player3, player4)
-        {
-            Id = 2
-        };
+    //    var player3 = new Player(Gender.Female, "Player 3", Guid.NewGuid());
+    //    var player4 = new Player(Gender.Female, "Player 4", Guid.NewGuid());
+    //    var team2 = new Team(player3, player4)
+    //    {
+    //        Id = 2
+    //    };
 
-        // Assert
-        FluentActions
-        .Invoking(() => new Match(team1, team2))
-        .Should()
-        .Throw<ArgumentException>();
-    }
+    //    // Assert
+    //    FluentActions
+    //    .Invoking(() => new Match(team1, team2))
+    //    .Should()
+    //    .Throw<ArgumentException>();
+    //}
 
 
-    [Fact]
-    public void IsValidMatch_Mixed_vs_MM_ShouldThrow()
-    {
-        // Arrange
-        var player1 = new Player(Gender.Male, "Player 1", Guid.NewGuid());
-        var player2 = new Player(Gender.Female, "Player 2", Guid.NewGuid());
-        var team1 = new Team(player1, player2)
-        {
-            Id = 1
-        };
+    //[Fact]
+    //public void IsValidMatch_Mixed_vs_MM_ShouldThrow()
+    //{
+    //    // Arrange
+    //    var player1 = new Player(Gender.Male, "Player 1", Guid.NewGuid());
+    //    var player2 = new Player(Gender.Female, "Player 2", Guid.NewGuid());
+    //    var team1 = new Team(player1, player2)
+    //    {
+    //        Id = 1
+    //    };
 
-        var player3 = new Player(Gender.Male, "Player 3", Guid.NewGuid());
-        var player4 = new Player(Gender.Male, "Player 4", Guid.NewGuid());
-        var team2 = new Team(player3, player4)
-        {
-            Id = 2
-        };
+    //    var player3 = new Player(Gender.Male, "Player 3", Guid.NewGuid());
+    //    var player4 = new Player(Gender.Male, "Player 4", Guid.NewGuid());
+    //    var team2 = new Team(player3, player4)
+    //    {
+    //        Id = 2
+    //    };
 
-        // Act & Assert
-        FluentActions
-        .Invoking(() => new Match(team1, team2))
-        .Should()
-        .Throw<ArgumentException>();
-    }
+    //    // Act & Assert
+    //    FluentActions
+    //    .Invoking(() => new Match(team1, team2))
+    //    .Should()
+    //    .Throw<ArgumentException>();
+    //}
 }

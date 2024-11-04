@@ -5,7 +5,7 @@ namespace Padel.Domain.Models;
 public class Season
 {
     public int Id { get; set; }
-    public int AmountOfMatches { get; private set; }
+    public int AmountOfMatches { get;  set; }
     public DateTime StartDate { get; private set; }
     public string Title { get; private set; }
     public DayOfWeek DayOfWeek { get; private set; }

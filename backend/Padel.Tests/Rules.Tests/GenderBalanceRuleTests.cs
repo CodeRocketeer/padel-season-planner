@@ -1,126 +1,204 @@
-using Padel.Application.Rules;
+using Padel.Domain.Models;
 
 
 
-namespace Padel.Tests
+namespace Padel.Tests.Rules;
+
+public class GenderBalanceRuleTests
 {
-    public class GenderBalanceRuleTests
+
+    private GenderBalanceRule _rule;
+
+    public GenderBalanceRuleTests()
     {
-
-        //[Fact]
-        //public void Validate_Returns0_WhenTeamsHaveEqualGenderBalance()
-        //{
-        //    // Arrange
-        //    var male1 = new Participant { Id = Guid.NewGuid(), Gender = "M" };
-        //    var female1 = new Participant { Id = Guid.NewGuid(), Gender = "F" };
-        //    var male2 = new Participant { Id = Guid.NewGuid(), Gender = "M" };
-        //    var female2 = new Participant { Id = Guid.NewGuid(), Gender = "F" };
-
-        //    var team1 = new Team(male1, female1);
-        //    var team2 = new Team(male2, female2);
-
-        //    var match = new Match(team1, team2);
-        //    var rule = new GenderBalanceRule();
-
-        //    // Act
-        //    var result = rule.Validate(match, new List<Match>(), new List<Player>());
-
-        //    // Assert
-        //    Assert.Equal(0, result);  // Expecting 0% fault as the gender balance is equal
-        //}
-
-        //[Fact]
-        //public void Validate_Returns100_When_2Males_VS_2Females()
-        //{
-        //    // Arrange
-        //    var male1 = new Participant { Id = Guid.NewGuid(), Gender = "M" };
-        //    var male2 = new Participant { Id = Guid.NewGuid(), Gender = "M" };
-        //    var female1 = new Participant { Id = Guid.NewGuid(), Gender = "F" };
-        //    var female2 = new Participant { Id = Guid.NewGuid(), Gender = "F" };
-
-        //    var team1 = new Team(male1, male2);
-        //    var team2 = new Team(female1, female2);
-
-        //    var match = new Match(team1, team2);
-        //    var rule = new GenderBalanceRule();
-
-        //    // Act
-        //    var result = rule.Validate(match, new List<Match>(), new List<Player>());
-
-        //    // Assert
-        //    Assert.Equal(100, result);  // Expecting 100% fault as the gender balance is equal
-        //}
-
-        //[Fact]
-        //public void Validate_Returns0_When_2Males_VS_2Males()
-        //{
-        //    // Arrange
-        //    var male1 = new Participant { Id = Guid.NewGuid(), Gender = "M" };
-        //    var male2 = new Participant { Id = Guid.NewGuid(), Gender = "M" };
-        //    var male3 = new Participant { Id = Guid.NewGuid(), Gender = "M" };
-        //    var male4 = new Participant { Id = Guid.NewGuid(), Gender = "M" };
-
-        //    var team1 = new Team(male1, male2);
-        //    var team2 = new Team(male3, male4);
-
-        //    var match = new Match(team1, team2);
-        //    var rule = new GenderBalanceRule();
-
-        //    // Act
-        //    var result = rule.Validate(match, new List<Match>(), new List<Player>());
-
-        //    // Assert
-        //    Assert.Equal(0, result);  // Expecting 100% fault as the gender balance is equal
-        //}
+        _rule = new GenderBalanceRule();
+    }
 
 
-        //[Fact]
-        //public void Validate_Returns0_When_2Females_VS_2Females()
-        //{
-        //    // Arrange
-        //    var female1 = new Participant { Id = Guid.NewGuid(), Gender = "F" };
-        //    var female2 = new Participant { Id = Guid.NewGuid(), Gender = "F" };
-        //    var female3 = new Participant { Id = Guid.NewGuid(), Gender = "F" };
-        //    var female4= new Participant { Id = Guid.NewGuid(), Gender = "F" };
+    private List<Player> CreatePlayers(int maleCount, int femaleCount)
+    {
+        var players = new List<Player>();
+        for (int i = 0; i < maleCount; i++)
+        {
+            players.Add(new Player(Gender.Male, $"Male Player {i}", Guid.NewGuid()));
+        }
+        for (int i = 0; i < femaleCount; i++)
+        {
+            players.Add(new Player(Gender.Female, $"Female Player {i}", Guid.NewGuid()));
+        }
+        return players;
+    }
 
-        //    var team1 = new Team(female1, female2);
-        //    var team2 = new Team(female3, female4);
+    [Fact]
+    public void Validate_Should_Return100FaultPoints_When_MatchSetIsEmpty()
+    {
+        // Arrange
+        var matchSet = new List<Match>();
+        var players = CreatePlayers(2, 2);
 
-        //    var match = new Match(team1, team2);
-        //    var rule = new GenderBalanceRule();
+        // Act
+        int result = _rule.Validate(matchSet, players);
 
-        //    // Act
-        //    var result = rule.Validate(match, new List<Match>(), new List<Player>());
-
-        //    // Asser
-        //    Assert.Equal(0, result);
-
-        //}
-
-        //[Fact]
-        //public void Validate_Returns100_WhenTeamsHaveUnequalGenderBalance()
-        //{
-        //    var female1 = new Participant {Id = Guid.NewGuid(), Gender = "F"};
-        //    var female2 = new Participant { Id = Guid.NewGuid(), Gender = "F" };
-        //    var female3 = new Participant { Id = Guid.NewGuid(), Gender = "F" };
-        //    var male1 = new Participant { Id = Guid.NewGuid(), Gender = "M" };
-
-        //    var team1 = new Team(female1, female2);
-        //    var team2 = new Team(female3, male1);
-
-        //    var match = new Match(team1, team2);
-        //    var rule = new GenderBalanceRule();
-
-        //    // Act
-        //    var result = rule.Validate(match, new List<Match>(), new List<Player>());
-
-        //    // Assert
-        //    Assert.Equal(100, result);
-        //}
+        // Assert
+        Assert.Equal(100, result);
+    }
 
 
+    [Fact]
+    public void Validate_Should_ReturnZeroFaultPoints_When_AllMatchesAreGenderBalanced()
+    {
+        // Arrange
+        var players = CreatePlayers(2, 2);
+        var teams = new List<Team>
+            {
+                new Team(players[0], players[2]){Id = 1}, // Male and Female
+                new Team(players[1], players[3]){Id = 2}  // Male and Female
+            };
+
+        var matchSet = new List<Match>
+            {
+                new Match(teams[0], teams[1])
+            };
+
+        // Act
+        int result = _rule.Validate(matchSet, players);
+
+        // Assert
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public void Validate_Should_ReturnOneFaultPoint_When_OneMatchIsPartialImbalance()
+    {
+        // Arrange
+        var teams = new List<Team>
+        {
+                new Team(new Player(Gender.Male, "Player 1", Guid.NewGuid()), new Player(Gender.Male, "Player 2", Guid.NewGuid())){Id = 1}, // Both Male
+                new Team(new Player(Gender.Male, "Player 3", Guid.NewGuid()), new Player(Gender.Female, "Player 4", Guid.NewGuid())){Id = 2}, // Male and Female (Balanced)
+            };
+
+        var matchSet = new List<Match>
+            {
+                new Match(teams[0], teams[1]), // partially imbalanced: (ex. mm vs mf)
+               
+            };
+
+        // Act
+        var players = new List<Player>();
+
+        int result = _rule.Validate(matchSet, players);
+
+        // Assert
+        Assert.Equal(1, result);
+    }
 
 
+    [Fact]
+    public void Validate_Should_ReturnTwoFaultPoint_When_OneMatchIsCompleteImbalance()
+    {
+        var teams = new List<Team>
+            {
+                new Team(new Player(Gender.Male, "Player 1", Guid.NewGuid()), new Player(Gender.Male, "Player 2", Guid.NewGuid())){Id = 1}, // Both Male
+                new Team(new Player(Gender.Female, "Player 3", Guid.NewGuid()), new Player(Gender.Female, "Player 4", Guid.NewGuid())){Id = 2} // Male and Female (Balanced)
+            };
+
+        var matchSet = new List<Match>
+            {
+                new Match(teams[0], teams[1]), // complete imbalanced: (ex. mm vs ff)
+             
+            };
+
+        // Act
+        var players = new List<Player>();
+
+        int result = _rule.Validate(matchSet, players);
+
+        // Assert
+        Assert.Equal(2, result);
 
     }
+
+    [Fact]
+    public void Validate_Should_ReturnTwoFaultPoints_When_TwoMatchesHavePartialImbalance()
+    {
+        var teams = new List<Team>
+            {
+                new Team(new Player(Gender.Male, "Player 1", Guid.NewGuid()), new Player(Gender.Female, "Player 2", Guid.NewGuid())){Id = 1},
+                new Team(new Player(Gender.Female, "Player 3", Guid.NewGuid()), new Player(Gender.Female, "Player 4", Guid.NewGuid())){Id = 2},
+                new Team(new Player(Gender.Male, "Player 5", Guid.NewGuid()), new Player(Gender.Male, "Player 6", Guid.NewGuid())){Id = 3},
+                new Team(new Player(Gender.Male, "Player 7", Guid.NewGuid()), new Player(Gender.Female, "Player 8", Guid.NewGuid())){Id = 4}
+            };
+
+        var matchSet = new List<Match>
+            {
+                new Match(teams[0], teams[1]), // partially imbalanced: (ex. mf vs ff)
+                new Match(teams[2], teams[3]) // partially imbalanced: (ex. mm vs mf)
+            };
+
+        // Act
+        var players = new List<Player>();
+
+        int result = _rule.Validate(matchSet, players);
+
+        // Assert
+        Assert.Equal(2, result);
+
+    }
+
+    [Fact]
+    public void Validate_Should_ReturnThreeFaultPoints_When_OneMatchHasCompleteImbalance_And_OneMatchHasPartialImbalance()
+    {
+        var teams = new List<Team>
+            {
+                new Team(new Player(Gender.Male, "Player 1", Guid.NewGuid()), new Player(Gender.Male, "Player 2", Guid.NewGuid())){Id = 1},
+                new Team(new Player(Gender.Female, "Player 3", Guid.NewGuid()), new Player(Gender.Female, "Player 4", Guid.NewGuid())){Id = 2},
+                new Team(new Player(Gender.Male, "Player 5", Guid.NewGuid()), new Player(Gender.Male, "Player 6", Guid.NewGuid())){Id = 3},
+                new Team(new Player(Gender.Male, "Player 7", Guid.NewGuid()), new Player(Gender.Female, "Player 8", Guid.NewGuid())){Id = 4}
+            };
+
+        var matchSet = new List<Match>
+            {
+                new Match(teams[0], teams[1]), // complete imbalanced: (ex. mm vs ff)
+                new Match(teams[2], teams[3]) // partially imbalanced: (ex. mm vs mf)
+            };
+
+        // Act
+        var players = new List<Player>();
+
+        int result = _rule.Validate(matchSet, players);
+
+        // Assert
+        Assert.Equal(3, result);
+    }
+
+    // TODO: Validate_Should_ReturnFourFaultPoints_When_TwoMatchesHaveCompleteImbalance
+    [Fact]
+    public void Validate_Should_ReturnFourFaultPoints_When_TwoMatchesHaveCompleteImbalance()
+    {
+        var teams = new List<Team>
+            {
+                new Team(new Player(Gender.Male, "Player 1", Guid.NewGuid()), new Player(Gender.Male, "Player 2", Guid.NewGuid())){Id = 1},
+                new Team(new Player(Gender.Female, "Player 3", Guid.NewGuid()), new Player(Gender.Female, "Player 4", Guid.NewGuid())){Id = 2},
+                new Team(new Player(Gender.Male, "Player 5", Guid.NewGuid()), new Player(Gender.Male, "Player 6", Guid.NewGuid())){Id = 3},
+                new Team(new Player(Gender.Female, "Player 7", Guid.NewGuid()), new Player(Gender.Female, "Player 8", Guid.NewGuid())){Id = 4}
+            };
+
+        var matchSet = new List<Match>
+            {
+                new Match(teams[0], teams[1]), // complete imbalanced: (ex. mm vs ff)
+                new Match(teams[2], teams[3]) // complete imbalanced: (ex. mm vs ff)
+            };
+
+        // Act
+        var players = new List<Player>();
+
+        int result = _rule.Validate(matchSet, players);
+
+        // Assert
+        Assert.Equal(4, result);
+    }
+
+
+
 }
+
