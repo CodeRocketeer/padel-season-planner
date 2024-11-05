@@ -20,7 +20,7 @@ namespace Padel.Application.Services.Interfaces
 
         Task<bool> JoinSeasonAsync(int seasonId, Guid userId, CancellationToken token);
 
-
+        Task<Season?> CreateSeasonScheduleAsync(int seasonId, CancellationToken token = default);
 
     }
 }

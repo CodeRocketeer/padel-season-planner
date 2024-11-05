@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Padel.Infrastructure.Repositories.Interfaces;
+using Padel.Shared.Options;
 
 namespace Padel.Infrastructure.Repositories;
 
@@ -24,11 +25,25 @@ public class PlayerRepository : IPlayerRepository
             .FirstOrDefaultAsync(p => p.Id == id, token);
     }
 
-    public async Task<IEnumerable<PlayerEntity>> GetAllAsync(CancellationToken token = default)
+    public async Task<PlayerEntity?> GetByUserIdAsync(Guid userId, CancellationToken token = default)
     {
         return await _context.Players
-            .Include(p => p.Teams) // Include teams if needed
-            .ToListAsync(token);
+            .FirstOrDefaultAsync(p => p.UserId == userId, token);
+    }
+
+    public async Task<IEnumerable<PlayerEntity>> GetAllAsync(GetAllPlayersOptions options, CancellationToken token = default)
+    {
+        // Start with the base query
+        IQueryable<PlayerEntity> query = _context.Players;
+
+        // Apply filtering based on SeasonId if provided
+        if (options.SeasonId.HasValue)
+        {
+            query = query.Where(p => p.Seasons.Any(s => s.Id == options.SeasonId.Value));
+        }
+
+        // Execute the query and return the results as a list
+        return await query.ToListAsync(token);
     }
 
     public async Task<PlayerEntity> AddAsync(PlayerEntity playerEntity, CancellationToken token = default)

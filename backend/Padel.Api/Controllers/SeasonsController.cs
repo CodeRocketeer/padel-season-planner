@@ -4,6 +4,7 @@ using Padel.Api.Auth;
 using Padel.Api.Mapping;
 using Padel.Application.Services.Interfaces;
 using Padel.Contracts.Requests.Season;
+using Padel.Domain.Models;
 
 
 
@@ -27,7 +28,7 @@ public class SeasonsController : ControllerBase
     {
         var season = request.MapToSeason();
         var result = await _seasonService.CreateAsync(season, token);
-       
+
         var seasonResponse = result.MapToResponse();
         return CreatedAtAction(nameof(Get), new { id = result.Id }, seasonResponse);
     }
@@ -53,8 +54,8 @@ public class SeasonsController : ControllerBase
     [HttpGet(ApiEndpoints.Seasons.GetAll)]
     public async Task<IActionResult> GetAll(CancellationToken token)
     {
-    
-        var seasons = await _seasonService.GetAllAsync( token);
+
+        var seasons = await _seasonService.GetAllAsync(token);
 
         var seasonsResponse = seasons.MapToResponse();
         return Ok(seasonsResponse);
@@ -97,7 +98,7 @@ public class SeasonsController : ControllerBase
     [HttpPost(ApiEndpoints.Seasons.Join)]
     public async Task<IActionResult> Join([FromRoute] int seasonId, CancellationToken token)
     {
-        var userId = HttpContext.GetUserId(); 
+        var userId = HttpContext.GetUserId();
         if (userId == null)
         {
             return Unauthorized();
@@ -118,18 +119,28 @@ public class SeasonsController : ControllerBase
 
     //[Authorize(AuthConstants.AdminUserPolicyName)]
     //[HttpPut(ApiEndpoints.Seasons.Confirm)]
-    //public async Task<IActionResult> Confirm([FromRoute] int id, CancellationToken token)
+    //public async Task<IActionResult> ConfirmSeasonSchedule([FromBody] ConfirmSeasonScheduleRequest request, CancellationToken token)
     //{
-    //    try
-    //    {
-    //        var userId = HttpContext.GetUserId();
-    //        var confirmed = await _seasonService.ConfirmSeasonAsync(id, userId,token);
-    //        return confirmed ? Ok() : NotFound();
-    //    }
-    //    catch (DirectoryNotFoundException ex)
-    //    {
-    //        // Catch the exception and return a 404 Not Found with the message
-    //        return NotFound(new { ex.Message });
-    //    }
+
+    //    //var userId = HttpContext.GetUserId();
+    //    var confirmed = await _seasonService.ConfirmSeasonAsync(id, userId, token);
+    //    return confirmed ? Ok() : NotFound();
     //}
+
+
+    [HttpPost(ApiEndpoints.Seasons.CreateSeasonSchedule)]
+    public async Task<IActionResult> CreateSeasonSchedule(int id, CancellationToken token)
+    {
+        
+        var seasonSchedule = await _seasonService.CreateSeasonScheduleAsync(id, token);
+
+        if (seasonSchedule is null)
+        {
+            return NotFound();
+        }
+        var seasonScheduleResponse = seasonSchedule.MapToSeasonScheduleResponse();
+        return Ok(seasonScheduleResponse);
+    }
+
 }
+

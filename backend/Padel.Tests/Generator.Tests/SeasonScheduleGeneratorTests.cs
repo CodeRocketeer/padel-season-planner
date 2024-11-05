@@ -75,7 +75,7 @@ namespace Padel.Tests.Generator.Tests
             };
 
             // Act
-            var result = await _seasonScheduleGenerator.GenerateSeasonSchedule(season, players);
+            var result = await _seasonScheduleGenerator.Generate(season, players);
 
 
             // Assert
@@ -94,7 +94,7 @@ namespace Padel.Tests.Generator.Tests
 
             // Act
             await FluentActions
-              .Invoking(() => _seasonScheduleGenerator.GenerateSeasonSchedule(season, players))
+              .Invoking(() => _seasonScheduleGenerator.Generate(season, players))
               .Should()
               .ThrowAsync<ArgumentException>();
 
@@ -107,7 +107,7 @@ namespace Padel.Tests.Generator.Tests
             var season = CreateRandomSeason();
             var randomPlayers = CreateRandomPlayers();
 
-            var result = await _seasonScheduleGenerator.GenerateSeasonSchedule(season, randomPlayers);
+            var result = await _seasonScheduleGenerator.Generate(season, randomPlayers);
 
             // Check that matches were generated
             result.Matches.Should().NotBeEmpty();
@@ -139,7 +139,7 @@ namespace Padel.Tests.Generator.Tests
             var randomPlayers = CreateRandomPlayers();
 
             // Act
-            var result = await _seasonScheduleGenerator.GenerateSeasonSchedule(season, randomPlayers);
+            var result = await _seasonScheduleGenerator.Generate(season, randomPlayers);
 
             // Ensure that the schedule has matches
             result.Matches.Should().NotBeEmpty("The schedule should contain matches.");
@@ -209,7 +209,7 @@ namespace Padel.Tests.Generator.Tests
             var randomPlayers = CreateRandomPlayers();
 
             // Act
-            var result = await _seasonScheduleGenerator.GenerateSeasonSchedule(season, randomPlayers);
+            var result = await _seasonScheduleGenerator.Generate(season, randomPlayers);
 
             // Ensure that the schedule has matches
             result.Matches.Should().NotBeEmpty();

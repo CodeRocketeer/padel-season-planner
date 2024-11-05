@@ -19,6 +19,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Padel.Application\Padel.Application.csproj" />
       <ProjectReference Include="..\Padel.Contracts\PadelContracts.csproj" />
+      <ProjectReference Include="..\Padel.Shared\Padel.Shared.csproj" />
     </ItemGroup>
 
 </Project>

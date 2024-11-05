@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Padel.Shared.Options;
 using Padel.Domain.Models;
 
 namespace Padel.Application.Services.Interfaces;
@@ -14,7 +15,7 @@ public interface IPlayerService
     Task<Player?> GetPlayerByIdAsync(int id, CancellationToken token = default);
 
     // Retrieve all players
-    Task<IEnumerable<Player>> GetAllPlayersAsync(CancellationToken token = default);
+    Task<IEnumerable<Player>> GetAllPlayersAsync(GetAllPlayersOptions options , CancellationToken token = default);
 
     // Add a new player
     Task<Player> AddPlayerAsync(Player player, CancellationToken token = default);

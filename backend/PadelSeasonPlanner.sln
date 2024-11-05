@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Tests", "Padel.Tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Domain", "Padel.Domain\Padel.Domain.csproj", "{00513259-2B3B-403F-918C-C40832E32158}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Padel.Infrastructure", "Padel.Infrastructure\Padel.Infrastructure.csproj", "{8A60DE3D-B267-4784-8E02-50D2BA875DF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Padel.Infrastructure", "Padel.Infrastructure\Padel.Infrastructure.csproj", "{8A60DE3D-B267-4784-8E02-50D2BA875DF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Padel.Shared", "Padel.Shared\Padel.Shared.csproj", "{600589B2-BCD9-481D-8194-E93FA051E40B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{8A60DE3D-B267-4784-8E02-50D2BA875DF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A60DE3D-B267-4784-8E02-50D2BA875DF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A60DE3D-B267-4784-8E02-50D2BA875DF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{600589B2-BCD9-481D-8194-E93FA051E40B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{600589B2-BCD9-481D-8194-E93FA051E40B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{600589B2-BCD9-481D-8194-E93FA051E40B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{600589B2-BCD9-481D-8194-E93FA051E40B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,6 +64,7 @@ Global
 		{B7E3091E-5FD2-41C9-AF03-092EB1C63453} = {99AB3B6D-4863-4146-92C2-B6D6BAED0FD7}
 		{00513259-2B3B-403F-918C-C40832E32158} = {99AB3B6D-4863-4146-92C2-B6D6BAED0FD7}
 		{8A60DE3D-B267-4784-8E02-50D2BA875DF6} = {99AB3B6D-4863-4146-92C2-B6D6BAED0FD7}
+		{600589B2-BCD9-481D-8194-E93FA051E40B} = {99AB3B6D-4863-4146-92C2-B6D6BAED0FD7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {348EA309-BEFE-4850-A497-C3AB665ED9BA}

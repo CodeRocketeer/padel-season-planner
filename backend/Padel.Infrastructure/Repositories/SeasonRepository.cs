@@ -75,7 +75,7 @@ public class SeasonRepository : ISeasonRepository
         var playerEntity = await _context.Players.FirstOrDefaultAsync(p => p.UserId == userId, token);
         if (playerEntity == null)
         {
-            return false; // Player not found
+            throw new KeyNotFoundException($"Player with ID {userId} not found."); // Throw an error if the player does not exist
         }
 
         // Fetch the SeasonEntity with the related Players
@@ -99,6 +99,8 @@ public class SeasonRepository : ISeasonRepository
         await _context.SaveChangesAsync(token);
         return true; // Successfully joined
     }
+
+    
 
 
 

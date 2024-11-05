@@ -7,6 +7,7 @@ using Padel.Application.Services;
 using Padel.Application.Services.Interfaces;
 using Padel.Infrastructure.Repositories.Interfaces;
 using Padel.Infrastructure.Repositories;
+using Padel.Application.Generators;
 
 
 namespace Padel.Application;
@@ -24,6 +25,10 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<ISeasonService, SeasonService>();
         services.AddScoped<IPlayerService, PlayerService>();
         //services.AddScoped<ISeederService, SeederService>();
+
+        services.AddScoped<SeasonScheduleGenerator>();
+        services.AddScoped<TeamGenerator>();
+        services.AddScoped<MatchGenerator>();
 
 
         // Registering rules as transient (or singleton, depending on your needs)

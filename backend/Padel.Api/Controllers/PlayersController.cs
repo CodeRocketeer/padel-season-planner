@@ -34,10 +34,13 @@ namespace Padel.Api.Controllers
         }
 
         [HttpGet(ApiEndpoints.Players.GetAll)] // GET api/players
-        public async Task<ActionResult<IEnumerable<Player>>> GetAllPlayers(CancellationToken token)
+        public async Task<ActionResult<IEnumerable<Player>>> GetAllPlayers([FromQuery] GetAllPlayersRequest request ,CancellationToken token)
         {
-            var players = await _playerService.GetAllPlayersAsync(token);
-            return Ok(players);
+            var options = request.MapToOptions();
+            var players = await _playerService.GetAllPlayersAsync(options, token);
+
+            var playersResponse = players.MapToResponse();
+            return Ok(playersResponse);
         }
 
         [Authorize]
