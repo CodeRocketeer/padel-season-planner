@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Padel.Api.Auth;
 using Padel.Api.Mapping;
 using Padel.Application;
-using Padel.Application.Database;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);

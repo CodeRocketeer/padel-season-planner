@@ -20,10 +20,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Padel.Application\Padel.Application.csproj" />
+    <ProjectReference Include="..\Padel.Domain\Padel.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services.Tests\" />
   </ItemGroup>
 
 </Project>

@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Padel.Api.Auth;
 using Padel.Api.Mapping;
-using Padel.Application.Models;
 using Padel.Application.Services.Interfaces;
 using PadelContracts.Requests.Player;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Padel.Domain.Models;
 
 namespace Padel.Api.Controllers
 {

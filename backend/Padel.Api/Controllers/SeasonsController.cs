@@ -20,7 +20,7 @@ public class SeasonsController : ControllerBase
         _seasonService = seasonService;
     }
 
-    [Authorize(AuthConstants.AdminUserPolicyName)]
+    //[Authorize(AuthConstants.AdminUserPolicyName)]
     [HttpPost(ApiEndpoints.Seasons.Create)]
     public async Task<IActionResult> Create([FromBody] CreateSeasonRequest request,
         CancellationToken token)

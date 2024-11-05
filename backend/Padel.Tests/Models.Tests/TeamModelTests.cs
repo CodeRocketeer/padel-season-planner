@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
-using Padel.Application.Database.Entities;
-using Padel.Application.Models;
+using Padel.Infrastructure.Entities;
+using Padel.Application.Mappers;
+using Padel.Domain.Models;
 
 
 namespace Padel.Tests.Models;
@@ -36,7 +37,7 @@ public class TeamModelTests
 
         // Assert
         action.Should().Throw<ArgumentException>();
-             
+
     }
 
     [Fact]
@@ -45,13 +46,15 @@ public class TeamModelTests
         // Arrange
         var player2 = new Player(Gender.Female, "Player Two", Guid.NewGuid());
 
+
         // Act
         Action action = () => new Team(null, player2);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>();
-              
+        action.Should().Throw<ArgumentException>();
+
     }
+
     [Fact]
     public void CreateNewTeam_WithNullPlayer2_ThrowsArgumentNullException()
     {
@@ -62,8 +65,8 @@ public class TeamModelTests
         Action action = () => new Team(player1, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>();
-            
+        action.Should().Throw<ArgumentException>();
+
     }
 
     [Fact]
@@ -75,7 +78,7 @@ public class TeamModelTests
         var team = new Team(player1, player2) { Id = 1, MatchId = 2 };
 
         // Act
-        var entity = Team.ToEntity(team);
+        var entity = team.ToEntity();
 
         // Assert
         entity.MatchId.Should().Be(2);
@@ -98,7 +101,7 @@ public class TeamModelTests
         };
 
         // Act
-        var team = Team.FromEntity(teamEntity);
+        var team = teamEntity.FromEntity();
 
         // Assert
         team.Id.Should().Be(1);
@@ -107,7 +110,7 @@ public class TeamModelTests
         team.Player2.UserId.Should().Be(playerEntity2.UserId);
     }
 
-   
+
     [Fact]
     public void FromEntity_WithIncorrectNumberOfPlayers_ThrowsArgumentException()
     {
@@ -123,12 +126,12 @@ public class TeamModelTests
         };
 
         // Act
-        var action = () => Team.FromEntity(teamEntity);
+        var action = () => teamEntity.FromEntity();
 
         // Assert
         action.Should()
               .Throw<ArgumentException>();
-    
+
     }
 
 

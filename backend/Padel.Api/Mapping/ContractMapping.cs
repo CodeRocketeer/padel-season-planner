@@ -1,13 +1,7 @@
-﻿
-
-using Padel.Application.Models;
-using Padel.Contracts.Requests.Season;
-using Padel.Contracts.Responses.Participants;
+﻿using Padel.Contracts.Requests.Season;
 using Padel.Contracts.Responses.Season;
-using PadelContracts.Requests.Participant;
+using Padel.Domain.Models;
 using PadelContracts.Requests.Player;
-using PadelContracts.Responses.Match;
-using PadelContracts.Responses.Team;
 
 namespace Padel.Api.Mapping;
 
@@ -36,7 +30,7 @@ public static class ContractMapping
             AmountOfMatches = season.AmountOfMatches,
             StartDate = season.StartDate,
             Title = season.Title,
-            DayOfWeek = season.DayOfWeek,        
+            DayOfWeek = season.DayOfWeek,
         };
     }
 
