@@ -4,7 +4,6 @@ namespace Padel.Domain.Models;
 
 public class Player
 {
-    public int Id { get; set; }
     public Guid UserId { get; private set; }
     public Gender Gender { get; private set; }
     public string Name { get; private set; }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Padel.Domain.Models;
+using System.Net;
 
 namespace Padel.Api.Controllers
 {
@@ -23,12 +24,12 @@ namespace Padel.Api.Controllers
         }
 
         [HttpGet(ApiEndpoints.Players.Get)] // GET api/players/{id}
-        public async Task<ActionResult<Player>> GetPlayer(int id, CancellationToken token)
+        public async Task<ActionResult<Player>> GetPlayer(Guid userId, CancellationToken token)
         {
-            var player = await _playerService.GetPlayerByIdAsync(id, token);
+            var player = await _playerService.GetPlayerByIdAsync(userId, token);
             if (player == null)
             {
-                return NotFound();
+                throw new KeyNotFoundException($"Player with ID {userId} not found.");
             }
             return Ok(player);
         }
@@ -53,31 +54,9 @@ namespace Padel.Api.Controllers
 
             var player = request.MapToPlayer(userId.Value);
             var createdPlayer = await _playerService.AddPlayerAsync(player, token);
-            return CreatedAtAction(nameof(GetPlayer), new { id = createdPlayer.Id }, createdPlayer);
+            return CreatedAtAction(nameof(GetPlayer), new { userId = createdPlayer.UserId }, createdPlayer);
         }
 
-        [HttpPut(ApiEndpoints.Players.Update)] // PUT api/players/{id}
-        public async Task<ActionResult<Player>> UpdatePlayer(int id, Player player, CancellationToken token)
-        {
-            // Ensure the player's ID matches the route parameter
-            if (id != player.Id)
-            {
-                return BadRequest("Player ID mismatch.");
-            }
 
-            var updatedPlayer = await _playerService.UpdatePlayerAsync(player, token);
-            return Ok(updatedPlayer);
-        }
-
-        [HttpDelete(ApiEndpoints.Players.Delete)] // DELETE api/players/{id}
-        public async Task<ActionResult> DeletePlayer(int id, CancellationToken token)
-        {
-            var deleted = await _playerService.DeletePlayerAsync(id, token);
-            if (!deleted)
-            {
-                return NotFound();
-            }
-            return NoContent();
-        }
     }
 }

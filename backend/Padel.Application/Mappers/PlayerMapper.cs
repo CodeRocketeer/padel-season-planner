@@ -13,18 +13,13 @@ public static class PlayerMapper
             UserId = player.UserId,
             Name = player.Name,
             Gender = player.Gender,
-
-            // Set Id only if it's already assigned to avoid overriding EF's auto-generation
-            Id = player.Id != 0 ? player.Id : 0 // Alternatively, you could omit this line if 0 is default
         };
     }
 
     public static Player FromEntity(this PlayerEntity playerEntity)
     {
         // Map entity to model, including Id
-        return new Player(playerEntity.Gender, playerEntity.Name, playerEntity.UserId)
-        {
-            Id = playerEntity.Id,
-        };
+        return new Player(playerEntity.Gender, playerEntity.Name, playerEntity.UserId);
+     
     }
 }

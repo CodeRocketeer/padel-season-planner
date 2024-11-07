@@ -17,11 +17,7 @@ public static class ApplicationServiceCollectionExtensions
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<ISeasonRepository, SeasonRepository>();
-        services.AddScoped<IPlayerRepository, PlayerRepository>();
-        services.AddScoped<ITeamRepository, TeamRepository>();
-        services.AddScoped<IMatchRepository, MatchRepository>();
-        services.AddScoped<ITeamService, TeamService>();
-        services.AddScoped<IMatchService, MatchService>();        
+        services.AddScoped<IPlayerRepository, PlayerRepository>();    
         services.AddScoped<ISeasonService, SeasonService>();
         services.AddScoped<IPlayerService, PlayerService>();
         //services.AddScoped<ISeederService, SeederService>();

@@ -88,9 +88,9 @@ public class SeasonRepository : ISeasonRepository
         }
 
         // Check if the player is already in the season
-        if (seasonEntity.Players.Any(p => p.Id == playerEntity.Id))
+        if (seasonEntity.Players.Any(p => p.UserId == playerEntity.UserId))
         {
-            throw new InvalidOperationException($"Player with ID {playerEntity.Id} has already joined season {seasonId}."); // Throw an error if the player is already a participant
+            throw new InvalidOperationException($"Player with ID {playerEntity.UserId} has already joined season {seasonId}."); // Throw an error if the player is already a participant
         }
 
         // Add the player to the season

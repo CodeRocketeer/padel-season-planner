@@ -6,69 +6,122 @@ using System.Threading;
 using System.Threading.Tasks;
 using Padel.Infrastructure.Repositories.Interfaces;
 using Padel.Shared.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Padel.Infrastructure.Repositories;
 
 public class PlayerRepository : IPlayerRepository
 {
     private readonly AppDbContext _context;
+    private readonly ILogger<PlayerRepository> _logger;
 
-    public PlayerRepository(AppDbContext context)
+    public PlayerRepository(AppDbContext context, ILogger<PlayerRepository> logger)
     {
         _context = context;
+        _logger = logger;
     }
-
-    public async Task<PlayerEntity?> GetByIdAsync(int id, CancellationToken token = default)
-    {
-        return await _context.Players
-            .Include(p => p.Teams) // Include related teams if necessary
-            .FirstOrDefaultAsync(p => p.Id == id, token);
-    }
-
     public async Task<PlayerEntity?> GetByUserIdAsync(Guid userId, CancellationToken token = default)
     {
-        return await _context.Players
-            .FirstOrDefaultAsync(p => p.UserId == userId, token);
+        try
+        {
+            return await _context.Players
+                .FirstOrDefaultAsync(p => p.UserId == userId, token);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching player by UserId.");
+            throw new Exception("An error occurred while fetching player details.", ex);
+        }
     }
 
     public async Task<IEnumerable<PlayerEntity>> GetAllAsync(GetAllPlayersOptions options, CancellationToken token = default)
     {
-        // Start with the base query
-        IQueryable<PlayerEntity> query = _context.Players;
-
-        // Apply filtering based on SeasonId if provided
-        if (options.SeasonId.HasValue)
+        try
         {
-            query = query.Where(p => p.Seasons.Any(s => s.Id == options.SeasonId.Value));
-        }
+            IQueryable<PlayerEntity> query = _context.Players;
 
-        // Execute the query and return the results as a list
-        return await query.ToListAsync(token);
+            if (options.SeasonId.HasValue)
+            {
+                query = query.Where(p => p.Seasons.Any(s => s.Id == options.SeasonId.Value));
+            }
+
+            return await query.ToListAsync(token);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching players.");
+            throw new Exception("An error occurred while fetching players.", ex);
+        }
     }
 
     public async Task<PlayerEntity> AddAsync(PlayerEntity playerEntity, CancellationToken token = default)
     {
-        await _context.Players.AddAsync(playerEntity, token);
-        await _context.SaveChangesAsync(token); // Ensure changes are saved
-        return playerEntity; // Return the created PlayerEntity
+        try
+        {
+            await _context.Players.AddAsync(playerEntity, token);
+            await _context.SaveChangesAsync(token); // Ensure changes are saved
+            return playerEntity; // Return the created PlayerEntity
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Error adding player.");
+            throw new Exception("An error occurred while adding the player.", dbEx);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while adding player.");
+            throw new Exception("An unexpected error occurred while adding the player.", ex);
+        }
     }
 
     public async Task<PlayerEntity> UpdateAsync(PlayerEntity playerEntity, CancellationToken token = default)
     {
-        _context.Players.Update(playerEntity); // Mark the entity as modified
-        await _context.SaveChangesAsync(token); // Save changes
-        return playerEntity; // Return the updated PlayerEntity
+        try
+        {
+            _context.Players.Update(playerEntity); // Mark the entity as modified
+            await _context.SaveChangesAsync(token); // Save changes
+            return playerEntity; // Return the updated PlayerEntity
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Error updating player.");
+            throw new Exception("An error occurred while updating the player.", dbEx);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while updating player.");
+            throw new Exception("An unexpected error occurred while updating the player.", ex);
+        }
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken token = default)
+    public async Task<bool> DeleteAsync(Guid userId, CancellationToken token = default)
     {
-        var playerEntity = await GetByIdAsync(id, token);
-        if (playerEntity != null)
+        try
         {
+            var playerEntity = await GetByUserIdAsync(userId, token);
+            if (playerEntity == null)
+            {
+                throw new KeyNotFoundException($"Player with UserId {userId} not found.");
+            }
+
             _context.Players.Remove(playerEntity); // Remove the player
             await _context.SaveChangesAsync(token); // Save changes
             return true; // Return true if deletion was successful
         }
-        return false; // Return false if player was not found
+        catch (KeyNotFoundException knfEx)
+        {
+            _logger.LogWarning(knfEx, "Player not found for deletion.");
+            return false; // Or you could throw the exception and handle it elsewhere
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError(dbEx, "Error deleting player.");
+            throw new Exception("An error occurred while deleting the player.", dbEx);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while deleting player.");
+            throw new Exception("An unexpected error occurred while deleting the player.", ex);
+        }
     }
 }

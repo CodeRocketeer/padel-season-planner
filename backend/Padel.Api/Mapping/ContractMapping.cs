@@ -78,7 +78,6 @@ public static class ContractMapping
     {
         return new PlayerResponse
         {
-            Id = player.Id,
             UserId = player.UserId,
             Name = player.Name,
             Gender = player.Gender,

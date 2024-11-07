@@ -16,15 +16,13 @@ namespace Padel.Infrastructure.Migrations
                 name: "Players",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Players", x => x.Id);
+                    table.PrimaryKey("PK_Players", x => x.UserId);
                 });
 
             migrationBuilder.CreateTable(
@@ -67,17 +65,17 @@ namespace Padel.Infrastructure.Migrations
                 name: "PlayerSeasons",
                 columns: table => new
                 {
-                    PlayersId = table.Column<int>(type: "integer", nullable: false),
+                    PlayersUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SeasonsId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlayerSeasons", x => new { x.PlayersId, x.SeasonsId });
+                    table.PrimaryKey("PK_PlayerSeasons", x => new { x.PlayersUserId, x.SeasonsId });
                     table.ForeignKey(
-                        name: "FK_PlayerSeasons_Players_PlayersId",
-                        column: x => x.PlayersId,
+                        name: "FK_PlayerSeasons_Players_PlayersUserId",
+                        column: x => x.PlayersUserId,
                         principalTable: "Players",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PlayerSeasons_Seasons_SeasonsId",
@@ -110,17 +108,17 @@ namespace Padel.Infrastructure.Migrations
                 name: "TeamPlayers",
                 columns: table => new
                 {
-                    PlayersId = table.Column<int>(type: "integer", nullable: false),
+                    PlayersUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     TeamsId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TeamPlayers", x => new { x.PlayersId, x.TeamsId });
+                    table.PrimaryKey("PK_TeamPlayers", x => new { x.PlayersUserId, x.TeamsId });
                     table.ForeignKey(
-                        name: "FK_TeamPlayers_Players_PlayersId",
-                        column: x => x.PlayersId,
+                        name: "FK_TeamPlayers_Players_PlayersUserId",
+                        column: x => x.PlayersUserId,
                         principalTable: "Players",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TeamPlayers_Teams_TeamsId",

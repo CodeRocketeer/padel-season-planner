@@ -12,7 +12,7 @@ using Padel.Infrastructure;
 namespace Padel.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241030151043_Init")]
+    [Migration("20241106142704_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -48,11 +48,9 @@ namespace Padel.Infrastructure.Migrations
 
             modelBuilder.Entity("Padel.Infrastructure.Entities.PlayerEntity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
@@ -61,10 +59,7 @@ namespace Padel.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("Players");
                 });
@@ -115,13 +110,13 @@ namespace Padel.Infrastructure.Migrations
 
             modelBuilder.Entity("PlayerEntitySeasonEntity", b =>
                 {
-                    b.Property<int>("PlayersId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("PlayersUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("SeasonsId")
                         .HasColumnType("integer");
 
-                    b.HasKey("PlayersId", "SeasonsId");
+                    b.HasKey("PlayersUserId", "SeasonsId");
 
                     b.HasIndex("SeasonsId");
 
@@ -130,13 +125,13 @@ namespace Padel.Infrastructure.Migrations
 
             modelBuilder.Entity("PlayerEntityTeamEntity", b =>
                 {
-                    b.Property<int>("PlayersId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("PlayersUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("TeamsId")
                         .HasColumnType("integer");
 
-                    b.HasKey("PlayersId", "TeamsId");
+                    b.HasKey("PlayersUserId", "TeamsId");
 
                     b.HasIndex("TeamsId");
 
@@ -169,7 +164,7 @@ namespace Padel.Infrastructure.Migrations
                 {
                     b.HasOne("Padel.Infrastructure.Entities.PlayerEntity", null)
                         .WithMany()
-                        .HasForeignKey("PlayersId")
+                        .HasForeignKey("PlayersUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -184,7 +179,7 @@ namespace Padel.Infrastructure.Migrations
                 {
                     b.HasOne("Padel.Infrastructure.Entities.PlayerEntity", null)
                         .WithMany()
-                        .HasForeignKey("PlayersId")
+                        .HasForeignKey("PlayersUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -10,10 +10,8 @@ namespace Padel.Infrastructure.Repositories.Interfaces;
 
 public interface IPlayerRepository
 {
-    Task<PlayerEntity?> GetByIdAsync(int id, CancellationToken token = default);
     Task<IEnumerable<PlayerEntity>> GetAllAsync(GetAllPlayersOptions options, CancellationToken token = default);
     Task<PlayerEntity?> GetByUserIdAsync(Guid userId, CancellationToken token = default);
     Task<PlayerEntity> AddAsync(PlayerEntity playerEntity,CancellationToken token = default);
-    Task<PlayerEntity> UpdateAsync(PlayerEntity playerEntity, CancellationToken token = default);
-    Task<bool> DeleteAsync(int id, CancellationToken token = default);
+
 }

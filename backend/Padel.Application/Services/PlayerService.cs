@@ -32,12 +32,6 @@ public class PlayerService : IPlayerService
         return createdEntity.FromEntity(); // Assuming AddAsync returns PlayerEntity
     }
 
-    public async Task<bool> DeletePlayerAsync(int id, CancellationToken token)
-    {
-        // Call the repository to delete the player by ID
-        return await _playerRepository.DeleteAsync(id, token);
-    }
-
     public async Task<IEnumerable<Player>> GetAllPlayersAsync(GetAllPlayersOptions options, CancellationToken token)
     {
         // Get all players from the repository
@@ -47,24 +41,15 @@ public class PlayerService : IPlayerService
         return players;
     }
 
-    public async Task<Player?> GetPlayerByIdAsync(int id, CancellationToken token)
+    public async Task<Player?> GetPlayerByIdAsync(Guid userId, CancellationToken token)
     {
         // Get the player entity from the repository
-        var playerEntity = await _playerRepository.GetByIdAsync(id, token);
+        var playerEntity = await _playerRepository.GetByUserIdAsync(userId, token);
+
         
         // Convert to Player model if found
-        return playerEntity != null ? playerEntity.FromEntity() : null;
+        return playerEntity != null ? playerEntity.FromEntity() : throw new KeyNotFoundException($"Player with id {userId} not found");
     }
 
 
-
-    public async Task<Player> UpdatePlayerAsync(Player player, CancellationToken token)
-    {
-        // Convert Player model to PlayerEntity
-        var playerEntity = player.ToEntity();
-        // Update the player in the repository
-        var updatedEntity = await _playerRepository.UpdateAsync(playerEntity, token);
-        // Return the updated Player model
-        return updatedEntity.FromEntity(); // Assuming UpdateAsync returns PlayerEntity
-    }
 }

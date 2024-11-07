@@ -12,7 +12,7 @@ public interface IPlayerService
 {
 
     // Retrieve a player by their ID
-    Task<Player?> GetPlayerByIdAsync(int id, CancellationToken token = default);
+    Task<Player?> GetPlayerByIdAsync(Guid userId, CancellationToken token = default);
 
     // Retrieve all players
     Task<IEnumerable<Player>> GetAllPlayersAsync(GetAllPlayersOptions options , CancellationToken token = default);
@@ -20,9 +20,5 @@ public interface IPlayerService
     // Add a new player
     Task<Player> AddPlayerAsync(Player player, CancellationToken token = default);
 
-    // Update an existing player
-    Task<Player> UpdatePlayerAsync(Player player, CancellationToken token = default);
 
-    // Delete a player by ID
-    Task<bool> DeletePlayerAsync(int id, CancellationToken token = default);
 }

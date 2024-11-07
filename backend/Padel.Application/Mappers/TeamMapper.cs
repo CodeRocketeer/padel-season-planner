@@ -35,8 +35,8 @@ public static class TeamMapper
             throw new ArgumentException("Team must have exactly two players.", nameof(teamEntity.Players));
         }
 
-        var player1 = new Player(players[0].Gender, players[0].Name, players[0].UserId) { Id = players[0].Id };
-        var player2 = new Player(players[1].Gender, players[1].Name, players[1].UserId) { Id = players[1].Id };
+        var player1 = new Player(players[0].Gender, players[0].Name, players[0].UserId);
+        var player2 = new Player(players[1].Gender, players[1].Name, players[1].UserId);
 
         return new Team(player1, player2)
         {

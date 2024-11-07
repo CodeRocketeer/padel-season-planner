@@ -9,8 +9,6 @@ namespace Padel.Infrastructure.Entities;
 public class PlayerEntity
 {
     [Key]
-    public int Id { get; init; }
-
     public Guid UserId { get; set; }
     public string Name { get; set; }
     public Gender Gender { get; set; }

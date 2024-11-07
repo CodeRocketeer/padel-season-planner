@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Padel.Api.Auth;
 using Padel.Api.Mapping;
+using Padel.Api.Middleware;
 using Padel.Application;
 using System.Text;
 
@@ -54,6 +55,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.MapControllers();
 
 

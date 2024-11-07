@@ -4,7 +4,6 @@ using Padel.Api.Auth;
 using Padel.Api.Mapping;
 using Padel.Application.Services.Interfaces;
 using Padel.Contracts.Requests.Season;
-using Padel.Domain.Models;
 
 
 
@@ -43,9 +42,8 @@ public class SeasonsController : ControllerBase
 
         if (season is null)
         {
-            return NotFound();
+            throw new KeyNotFoundException($"Season with id {id} not found");
         }
-
         var response = season.MapToResponse();
         return Ok(response);
     }
@@ -114,9 +112,6 @@ public class SeasonsController : ControllerBase
         return Ok("Successfully joined the season.");
     }
 
-
-
-
     //[Authorize(AuthConstants.AdminUserPolicyName)]
     //[HttpPut(ApiEndpoints.Seasons.Confirm)]
     //public async Task<IActionResult> ConfirmSeasonSchedule([FromBody] ConfirmSeasonScheduleRequest request, CancellationToken token)
@@ -131,7 +126,7 @@ public class SeasonsController : ControllerBase
     [HttpPost(ApiEndpoints.Seasons.CreateSeasonSchedule)]
     public async Task<IActionResult> CreateSeasonSchedule(int id, CancellationToken token)
     {
-        
+
         var seasonSchedule = await _seasonService.CreateSeasonScheduleAsync(id, token);
 
         if (seasonSchedule is null)
